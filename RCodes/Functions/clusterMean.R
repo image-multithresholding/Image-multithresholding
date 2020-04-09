@@ -5,7 +5,7 @@
 ############################################################################################
 
 # Arguments:
-# prob the probability vector of gray levels 0,1,...,L
+# prob the probability vector of gray levels 0,1,...,L-1
 # clust a clust of the gray levels
 
 # Value:
