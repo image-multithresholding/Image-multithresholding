@@ -5,11 +5,11 @@
 ############################################################################################
 
 # Arguments:
-# prob the probability vector of gray levels ,1,...,L
+# prob the probability vector of gray levels 0,1,...,L
 # clust a clust of the gray levels
 
 # Value:
-# clustMean returns an object with class "numeric" 
+# clusterMean returns an object with class "numeric" 
 
 ############################################################################################
 
