@@ -21,7 +21,7 @@ thresholdMCC <- function(prob, k){
   
   L <- length(prob)
   
-  # We differentiat cases for memory problems
+  # We differentiate cases for memory problems
   
   if (k==2 | k==3 | k==4){
     
