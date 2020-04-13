@@ -15,7 +15,7 @@
 
 thresholdOtsu <- function(prob, k){
   
-  # Find the amount of gray levels equal to number of prababilities
+  # Find the amount of gray levels equal to number of probabilities
   
   L <- length(prob)
   
