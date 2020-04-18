@@ -5,7 +5,7 @@
 ############################################################################################
 
 # Arguments:
-# prob the probability vector of gray levels 0,1,...,L-1
+# img an cimg object
 # k number of classes
 
 # Value:
@@ -13,7 +13,11 @@
 
 ############################################################################################
 
-thresholdFastOtsu <- function(prob, k){
+thresholdFastOtsu <- function(img, k){
+  
+  # Find the vector of probabilities of the gray leves 0,1,...,L-1
+  
+  prob <- imageProbabilities(img)$prob
   
   # Find the amount of gray levels equal to number of probabilities
   

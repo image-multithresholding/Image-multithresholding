@@ -6,11 +6,11 @@
 ############################################################################################
 
 # Arguments:
-# prob the probability vector of gray levels 0,1,...,L-1
+# img an cimg object
 # maxk maximun amount of permited classes
 
 # Value:
-# optimalClassesATC returns an list with class "list" containing the following components:
+# optimalClassesATC returns a list with class "list" containing the following components:
 # classes
 #    optimal classification number
 # thresholds
@@ -19,7 +19,11 @@
 
 ############################################################################################
 
-optimalClassesATC <- function(prob, maxk){
+optimalClassesATC <- function(img, maxk){
+  
+  # Find the vector of probabilities of the gray leves 0,1,...,L-1
+  
+  prob <- imageProbabilities(img)$prob
   
   # Find the amount of gray levels equal to the amount of probabilities
   
@@ -55,7 +59,7 @@ optimalClassesATC <- function(prob, maxk){
     
     varClust <- vector()
     for (j in 1:(i+1)){
-      varClust[j] <- clusterVar(prob, clust[j,][clust[j,]!=-1])
+      varClust[j] <- clusterVar(prob, clust[j,][clust[j,]!=-1], 0)
       # notice we must remove those fictitious elements; i.e. -1
     }
     

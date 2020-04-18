@@ -40,12 +40,12 @@ betweenClassVar <- function(prob, levels){
   
   for (i in 1:n){
     newClust <- clust[i,][clust[i,]!=-1] # notice to discard fictitious values, i.e. -1
-    mu[i] <- clusterMean(prob, newClust)
+    mu[i] <- clusterMean(prob, newClust, 0)
   }
   
   # Find the total mean of gray levels
   
-  totalMean <- clusterMean(prob, 0:(L-1))
+  totalMean <- clusterMean(prob, 0:(L-1), 0)
   
   # Initialize
   

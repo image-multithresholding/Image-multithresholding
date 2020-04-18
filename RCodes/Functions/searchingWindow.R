@@ -1,6 +1,7 @@
 ############################################################################################
 
-## Find searching windows of a cluster as defined in Chang et al. (2002)
+## Find searching windows of a cluster as defined in Chang et al. (2002), giving first and
+## last element of each cluster
 
 ############################################################################################
 
@@ -14,29 +15,41 @@
 
 searchingWindow <- function(clust){
   
-  # Find length of the cluster 
+  # Find length of the initial cluster 
   
   n <- clust[2]-clust[1]+1
   
-  # Find length of the searching windows
+  # If n=2, nothing to do
   
-  len <- n/2
+  if (n==2){
+    w <- t(as.matrix(clust))
+  }
   
-  # Find the amout of searching windows
+  else{
   
-  total <- n - len +1
-  
-  # Initialize
-  
-  w <- matrix(0, nrow = total, ncol = len)
-  
-  # Find searching windows
-  
-  for (j in 1:total){
-    w[j,] <- (clust[1]+j-1):(clust[1]+j+len-2)
+    # Find length of the searching windows
+    
+    len <- n/2
+    
+    # Find the amout of searching windows
+    
+    total <- n - len +1
+    
+    # Initialize
+    
+    # w <- matrix(0, nrow = total, ncol = len)
+    w <- matrix(0, nrow = total, ncol = 2)
+    
+    # Find searching windows
+    
+    for (j in 1:total){
+      w[j,] <- c(clust[1]+j-1, ceiling(clust[1]+j+len-2))
+    }
   }
   
   # Output
   
   return(w)
 }
+
+
