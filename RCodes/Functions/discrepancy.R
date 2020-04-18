@@ -34,7 +34,7 @@ discrepancy <- function(prob, thr){
   # Find the variance per class (notice we must remove those fictitious elements; i.e. -1)
   
   for (i in 1:dim(clust)[1]){
-    var[i] <- clusterVar(prob, clust[i,][clust[i,]!=-1])
+    var[i] <- clusterVar(prob, clust[i,][clust[i,]!=-1], 0)
   }
   
   # Find the discrepancy
