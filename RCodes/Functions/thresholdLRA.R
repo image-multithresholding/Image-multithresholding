@@ -1,6 +1,6 @@
 ############################################################################################
 
-## Find thresholds of the gray levels according to Papamarkos and Gatos method (1994)
+## Find thresholds of the gray levels according to the method proposed by Papamarkos and Gatos (1994)
 
 ############################################################################################
 
