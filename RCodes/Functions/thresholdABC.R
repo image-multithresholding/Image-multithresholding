@@ -1,6 +1,6 @@
 ############################################################################################
 
-## Find thresholds of the gray levels according to Horng method (2011)
+## Find thresholds of the gray levels according to the method proposed by Horng (2011)
 
 ############################################################################################
 
