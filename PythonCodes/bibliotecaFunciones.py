@@ -8,22 +8,17 @@ def thresholdedImage(img, thr):
 thresholdedImage function
 
 Arguments:
-img an cimg object
+img a "numpy.ndarray" object
 thr a list of thresholds
 
 Value:
-thresholdingImage returns an object with class "cimg" and possible values 0,1,...,255
+thresholdingImage returns an object with class "numpy.ndarray" and possible values 0,1,...,255
 
 """
 
-    #Convert image to data
+    # Normalize gray levels in the range 0,1,...,255
     
-    try:
-        image = io.imread(img, as_gray=True)
-    except:
-        print("[Error!]: incorrect image path and/or name\n") #Error check
-        print("[Error!]: other possible error involves incorrect 'img' (image) argument data type") #Error check
-        exit()
+    image = util.img_as_ubyte(img)
 
     #Convert threshold to numpy array
 
@@ -35,14 +30,10 @@ thresholdingImage returns an object with class "cimg" and possible values 0,1,..
             continue
         print("[Error!]: there are repetead values in 'thr' (list of thresholds) argument") #Error check
         exit()
-
-    # Normalize gray levels in the range 0,1,...,255
-    
-    image = util.img_as_ubyte(image)
     
     # Find and sort gray levels
     
-    _, grays = exposure.histogram(image)
+    _, grays = exposure.histogram(img)
     
     # Find amount of gray levels and thresholds
 
@@ -72,7 +63,7 @@ thresholdingImage returns an object with class "cimg" and possible values 0,1,..
 
     # Replace each gray value in the image by the mean of its class
 
-    np.place(image, ma.masked_inside(image, grays[0], grays[thr[1]]), avg[0])
+    np.place(image, ma.masked_inside(image, grays[0], grays[thr[0]]), avg[0])
     if(K != 1):
         for i in range(1, K):
             np.place(image, ma.masked_inside(image, grays[thr[i-1]+1], grays[thr[i]]), avg[i])
