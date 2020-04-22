@@ -1,6 +1,6 @@
 ############################################################################################
 
-## Find thresholds of the gray levels according to Tsai and Chen method (1992)
+## Find thresholds of the gray levels according to the method proposed by Tsai and Chen (1992)
 
 ############################################################################################
 
