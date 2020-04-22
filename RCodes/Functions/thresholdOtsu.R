@@ -1,6 +1,6 @@
 ############################################################################################
 
-## Find thresholds of the gray levels according to Otsu method (1979)
+## Find thresholds of the gray levels according to the method proposed by Otsu (1979)
 
 ############################################################################################
 
