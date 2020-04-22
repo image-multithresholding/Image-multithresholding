@@ -22,6 +22,9 @@ thresholdingImage returns an object with class "numpy.ndarray" and possible valu
 
     #Convert threshold to numpy array
 
+    if(isinstance(thr, int)):
+        thr = np.array([thr], dtype=int)
+
     thr = np.array(thr, dtype=int)
 
     _, counts = np.unique(thr, return_counts=True) 
