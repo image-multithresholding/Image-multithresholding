@@ -11,11 +11,10 @@
 # Value:
 # thresholdABC returns a list with class "numeric" 
 
-############################################################################################
-
-# Load libraries
-
+# Required
 library(imagerExtra)
+
+############################################################################################
 
 thresholdABC <- function(img, k){
   
