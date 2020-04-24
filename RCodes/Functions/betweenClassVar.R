@@ -24,7 +24,7 @@ betweenClassVar <- function(prob, levels){
   
   L <- length(prob)
   
-  # Find the classes (notice to sum 1 since the argument is position, not level)
+  # Find the classes (notice to sum 1 since the argument is level, not position)
   
   clust <- grayClustering(L, levels+1)
   
