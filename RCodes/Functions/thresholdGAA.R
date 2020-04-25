@@ -11,7 +11,7 @@
 # iter number of iterations, 100 by default
 # populationSize number of initial populatio, 10 by default
 # crossoverRate fraction to replace by crossover, 0.95 by default
-# mutationRate fraction to replace by mutation 0.05 by default
+# mutationRate fraction to replace by mutation, 0.05 by default
 
 # Value:
 # thresholdGAA returns a list with class "numeric"
