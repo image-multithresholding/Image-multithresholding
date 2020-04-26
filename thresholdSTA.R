@@ -7,7 +7,7 @@
 # Arguments:
 # img an cimg object
 # k number of classes
-# iter number of iterations, 100 by default
+# iter number of iterations, 1500 by default
 # maxRotationFactor maximum value for the rotation factor, 1 by default
 # minRotationFactor minimum value for the rotation factor, 0.0001 by default
 # tranlationFactor value for the translation factor, 1 by default
@@ -22,7 +22,7 @@
 
 ############################################################################################
 
-thresholdSTA <- function(img, k, iter=1000, maxRotationFactor=1, minRotationFactor=0.0001, 
+thresholdSTA <- function(img, k, iter=1500, maxRotationFactor=1, minRotationFactor=0.0001, 
                          translationFactor=1, expansionFactor=1, axesionFactor=1,
                          lesseningCoef=2, searchEnforcement=30, penalty=10){
   
