@@ -226,7 +226,7 @@ thresholdSTA <- function(img, k, iter=1500, maxRotationFactor=1, minRotationFact
   
   # Find optimum coefficients
   
-  optCoef <- optimumCoef(bestState[1:k],bestState[(k+1):(2*k)], bestState[(2*k+1):(3*k)])
+  optCoef <- optimumCoef(bestState[1:k], bestState[(k+1):(2*k)], bestState[(2*k+1):(3*k)])
   
   # Initialize
   
