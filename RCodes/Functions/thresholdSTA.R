@@ -7,7 +7,7 @@
 # Arguments:
 # img an cimg object
 # k number of classes
-# iter number of iterations, 1500 by default
+# iter number of iterations, 500 by default
 # maxRotationFactor maximum value for the rotation factor, 1 by default
 # minRotationFactor minimum value for the rotation factor, 0.0001 by default
 # tranlationFactor value for the translation factor, 1 by default
@@ -22,7 +22,7 @@
 
 ############################################################################################
 
-thresholdSTA <- function(img, k, iter=1500, maxRotationFactor=1, minRotationFactor=0.0001, 
+thresholdSTA <- function(img, k, iter=500, maxRotationFactor=1, minRotationFactor=0.0001, 
                          translationFactor=1, expansionFactor=1, axesionFactor=1,
                          lesseningCoef=2, searchEnforcement=30, penalty=10){
   
@@ -224,23 +224,56 @@ thresholdSTA <- function(img, k, iter=1500, maxRotationFactor=1, minRotationFact
   
   bestState <- c(solutions[which(fittingError == bestError),])
   
-  # Find optimum coefficients
+  # Order the means
   
-  optCoef <- optimumCoef(bestState[1:k], bestState[(k+1):(2*k)], bestState[(2*k+1):(3*k)])
+  orderMeans <- sort(bestState[(k+1):(2*k)])
   
   # Initialize
   
-  thr <- vector()
+  orderPos <- vector()
+  
+  # Find positions according to mean order
+  
+  for (i in 1:length(orderMeans)){
+    orderPos[i] <- which(bestState[(k+1):(2*k)] == orderMeans[i])
+  }
+  
+  # Initialize
+  
+  orderBestState <- vector()
+  
+  # Order the classes according to order means
+  
+  for (i in 1:k){
+    orderBestState[i] <- bestState[orderPos[i]]
+  }
+  
+  for (i in 1:k){
+    orderBestState[k+i] <- bestState[k+orderPos[i]]
+  }
+  
+  for (i in 1:k){
+    orderBestState[2*k+i] <- bestState[2*k+orderPos[i]]
+  }
+  
+  # Find optimum coefficients
+  
+  optCoef <- optimumCoef(orderBestState[1:k], orderBestState[(k+1):(2*k)], 
+                         orderBestState[(2*k+1):(3*k)])
+  
+  # Initialize
+  
+  thr <- matrix(0, nrow=k-1, ncol=2)
   
   # Find solutions of the optimization quadratic
   
   for (i in 1:(k-1)){
-    thr[i] <- quadraticSolve(optCoef[i,1], optCoef[i,2], optCoef[i,3])
+    thr[i,] <- quadraticSolve(optCoef[i,1], optCoef[i,2], optCoef[i,3])
   }
   
   # Convert to integer
   
-  thr <- round(thr,0)
+  thr <- as.vector(round(thr,0))
   
   # Order only posible solutions
   
