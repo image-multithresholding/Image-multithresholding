@@ -9,19 +9,15 @@
 # thr a list of thresholds
 
 # Value:
-# thresholdingImage returns an object with class "cimg" and possible values 0,1,...,255
+# thresholdedImage returns an object with class "cimg" 
 
 ############################################################################################
 
-thresholdingImage <- function(img, thr){
+thresholdedImage <- function(img, thr){
   
   # Convert image to data
   
   data <- as.data.frame(img)
-  
-  # Normalize gray levels in the range 0,1,...,255
-  
-  data$value <- round(data$value*255) 
   
   # Find and sort gray levels
   
@@ -42,11 +38,7 @@ thresholdingImage <- function(img, thr){
     }
   }
   avg[K+1] <- mean(grays[(thr[K]+1):L])
-  
-  # Round the means
-  
-  avg <- round(avg)
-  
+
   # Replace each gray value in the image by the mean of its class
   
   data$value[data$value %in% grays[1:thr[1]]] <- avg[1]
@@ -65,6 +57,4 @@ thresholdingImage <- function(img, thr){
   
   return(data)
 }
-
-########################################################################
 
