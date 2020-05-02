@@ -21,7 +21,7 @@ thresholdHCA <- function(img, k){
   
   # Find the amount of gray levels 
   
-  L <- length(grays)
+  L <- length(freq)
   
   # Find the cell size 
   
