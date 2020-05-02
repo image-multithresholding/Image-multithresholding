@@ -1,6 +1,7 @@
 ############################################################################################
 
-## Find thresholds of the gray levels according to the method proposed by Papamarkos and Gatos (1994)
+## Find thresholds of the gray levels according to the method proposed by Papamarkos and 
+## Gatos (1994)
 
 ############################################################################################
 
@@ -159,21 +160,24 @@ thresholdLRA <- function(img, k, n, m){
   
   # Find the rest of thresholds
   
-  for (i in 2:(k-1)){
-    valley <- sort(as.vector(cells[(peakLocation[i]+1):peakLocation[i+1],]))
-    
-    if (n ==2 & m == 2){
-      thr[i] <- argminRF22(valley, freq[valley])
-    }
-    
-    if (n ==2 & m == 3){
-      thr[i] <- argminRF23(valley, freq[valley])
-    }
-    
-    if (n ==3 & m == 2){
-      thr[i] <- argminRF32(valley, freq[valley])
+  if (k != 2){
+    for (i in 2:(k-1)){
+      valley <- sort(as.vector(cells[(peakLocation[i]+1):peakLocation[i+1],]))
+      
+      if (n ==2 & m == 2){
+        thr[i] <- argminRF22(valley, freq[valley])
+      }
+      
+      if (n ==2 & m == 3){
+        thr[i] <- argminRF23(valley, freq[valley])
+      }
+      
+      if (n ==3 & m == 2){
+        thr[i] <- argminRF32(valley, freq[valley])
+      }
     }
   }
+  
   
   # Output
   
