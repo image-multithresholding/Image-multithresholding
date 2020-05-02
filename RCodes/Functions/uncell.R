@@ -27,6 +27,10 @@ uncell <- function(L, size){
   
   complete <- size-rest
   
+  # Find the frequecies of the gray leves 1,...,L
+  
+  freq <- imageHistogram(img)$freq
+  
   # Arrange frequency vector to have length a multiple of cell size
   
   freq <- c(freq, rep(0, complete))
