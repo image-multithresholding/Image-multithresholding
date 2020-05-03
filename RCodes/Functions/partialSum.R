@@ -25,6 +25,10 @@ partialSum <- function(prob, maxLevel, levels){
   n <- length(levels)
   
   if (n==1){
+    # Initialize
+    
+    term <- vector()
+    
     term[1] <- criterionTerm(prob, levels, 0)
     term[2] <- criterionTerm(prob, maxLevel, levels)
   }
@@ -41,14 +45,6 @@ partialSum <- function(prob, maxLevel, levels){
       term[i] <- criterionTerm(prob, levels[i], levels[i-1])
     }
     term[n+1] <- criterionTerm(prob, maxLevel, levels[n])
-  }
-  
-  # Discard cases where the variance is zero, i.e. classes with only one element
-  
-  for (i in 1:n){
-    if(term[i] == -Inf){
-      term[i] <- 0
-    }
   }
   
   # Find the sum
