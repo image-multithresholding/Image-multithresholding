@@ -27,7 +27,7 @@ PSNR <- function(img, thImg){
   
   # Compute the peak signal to noise ratio (PSNR)
   
-  psnr <- 20 * log(255/rmse) / log(10)
+  psnr <- 20 * log(max(img)/rmse) / log(10)
 
   # Output
 
