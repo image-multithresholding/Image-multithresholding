@@ -20,7 +20,7 @@ thresholdingImage returns an object with class "numpy.ndarray" and possible valu
 
     # Normalize gray levels in the range 0,1,...,255
     
-    image = util.img_as_ubyte(image)
+    image = util.img_as_ubyte(image) # no iría!!
 
     #Convert threshold to numpy array
 
