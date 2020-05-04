@@ -1,4 +1,4 @@
-from skimage import io,util,exposure
+from skimage import io,util,exposure, measure
 import numpy as np
 import numpy.ma as ma
 
@@ -16,9 +16,11 @@ thresholdingImage returns an object with class "numpy.ndarray" and possible valu
 
 """
 
+    image = np.copy(img)
+
     # Normalize gray levels in the range 0,1,...,255
     
-    image = util.img_as_ubyte(img)
+    image = util.img_as_ubyte(image)
 
     #Convert threshold to numpy array
 
@@ -76,3 +78,48 @@ thresholdingImage returns an object with class "numpy.ndarray" and possible valu
     #Output
 
     return image
+
+
+
+def PSNR(img, thImg):
+
+    """
+Compute the peak signal to noise ratio (PSNR) measured in decibel (dB) of a thersholded 
+image
+
+Arguments:
+img a "numpy.ndarray" object
+thImg a thresholded image of img, a "numpy.ndarray" object
+
+Value:
+PSNR returns an object with type class 'numpy.float64'
+"""
+
+    image = np.copy(img)
+    thresholdedImage = np.copy(thImg)
+
+    # Convert images to appropiate data type
+
+    image = np.asarray(image, dtype=np.int32)
+    thresholdedImage = np.asarray(thresholdedImage, dtype=np.int32)
+
+    print(image)
+    print(thresholdedImage)
+    print((image-thresholdedImage)**2)
+    # Checking if the images shape match
+
+    if(image.shape != thresholdedImage.shape):
+        print("[Error!]: the shape of 'img' and 'thImg' does not match")
+        exit()
+    
+    # Compute the root mean-squared error (RMSE)
+
+    rmse = np.mean((image - thresholdedImage) ** 2)
+
+    # Compute the peak signal to noise ratio (PSNR)
+
+    psnr = 10 * np.log10(255**2 / rmse)
+
+    return psnr
+
+
