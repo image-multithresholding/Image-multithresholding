@@ -9,11 +9,11 @@
 # k number of classes that must be odd
 
 # Value:
-# thresholFSR returns a list with class "numeric" 
+# thresholdFSR returns a list with class "numeric" 
 
 ############################################################################################
 
-thresholFSR <- function(img, k){
+thresholdFSR <- function(img, k){
   
   # Find the gray values
   
@@ -32,7 +32,7 @@ thresholFSR <- function(img, k){
   
   # Find thresholds
   
-  for (i in 1:n){
+  for (i in 1:(n+1)){
     
     # Find the mean of the interval
     

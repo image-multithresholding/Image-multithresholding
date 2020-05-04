@@ -84,7 +84,7 @@ thresholdDEO <- function(img, k, iter=500, numberPop=90, mutationFactor=0.25,
     
     # Find the best solution in the population
     
-    bestSolution <- solutions[min(which(fittingerror == min(fittingerror))),]
+    bestSolution <- solutions[min(which(fittingError == min(fittingError))),]
     
     ##############################################################
     
