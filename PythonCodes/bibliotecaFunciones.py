@@ -1,6 +1,7 @@
-from skimage import io,util,exposure, measure
+from skimage import exposure
 import numpy as np
 import numpy.ma as ma
+from math import sqrt
 
 def thresholdedImage(img, thr):
     
@@ -17,10 +18,6 @@ thresholdingImage returns an object with class "numpy.ndarray" and possible valu
 """
 
     image = np.copy(img)
-
-    # Normalize gray levels in the range 0,1,...,255
-    
-    image = util.img_as_ubyte(image) # no iría!!
 
     #Convert threshold to numpy array
 
@@ -103,9 +100,6 @@ PSNR returns an object with type class 'numpy.float64'
     image = np.asarray(image, dtype=np.int32)
     thresholdedImage = np.asarray(thresholdedImage, dtype=np.int32)
 
-    print(image)
-    print(thresholdedImage)
-    print((image-thresholdedImage)**2)
     # Checking if the images shape match
 
     if(image.shape != thresholdedImage.shape):
@@ -114,12 +108,10 @@ PSNR returns an object with type class 'numpy.float64'
     
     # Compute the root mean-squared error (RMSE)
 
-    rmse = np.mean((image - thresholdedImage) ** 2)
+    rmse = sqrt(np.mean((image - thresholdedImage) ** 2))
 
     # Compute the peak signal to noise ratio (PSNR)
 
-    psnr = 10 * np.log10(255**2 / rmse)
+    psnr = 20 * np.log10(np.max(img) / rmse)
 
     return psnr
-
-
