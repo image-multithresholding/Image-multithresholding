@@ -64,12 +64,20 @@ thresholdingImage returns an object with class "numpy.ndarray" and possible valu
     avg = np.round(avg)
 
     # Replace each gray value in the image by the mean of its class
-
-    np.place(image, ma.masked_inside(image, grays[0], grays[thr[0]]), avg[0])
+    
+    image[(image>=grays[0]) & (image<=grays[thr[0]])] = avg[0]
     if(K != 1):
         for i in range(1, K):
-            np.place(image, ma.masked_inside(image, grays[thr[i-1]+1], grays[thr[i]]), avg[i])
-    np.place(image, ma.masked_inside(image, grays[thr[K-1]+1], grays[L-1]), avg[K])
+            image[(image>=grays[thr[i-1]+1]) & (image<=grays[thr[i]])] = avg[i]
+    image[image>grays[thr[K-1]]] = avg[-1]
+
+    # COMENTÉ LO QUE SIGUE POR LAS DUDAS QUE SIGAN HABIENDO ERRORES
+    
+    # np.place(image, ma.masked_inside(image, grays[0], grays[thr[0]]), avg[0])
+    # if(K != 1):
+      #  for i in range(1, K):
+       #     np.place(image, ma.masked_inside(image, grays[thr[i-1]+1], grays[thr[i]]), avg[i])
+    #np.place(image, ma.masked_inside(image, grays[thr[K-1]+1], grays[L-1]), avg[K])
 
 
     #Output
