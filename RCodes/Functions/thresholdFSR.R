@@ -32,7 +32,7 @@ thresholdFSR <- function(img, k){
   
   # Find thresholds
   
-  for (i in 1:n){
+  for (i in 1:(n+1)){
     
     # Find the mean of the interval
     
