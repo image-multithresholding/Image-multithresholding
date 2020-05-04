@@ -64,7 +64,7 @@ thresholdingImage returns an object with class "numpy.ndarray" and possible valu
     avg = np.round(avg)
 
     # Replace each gray value in the image by the mean of its class
-
+    
     image[(image>=grays[0]) & (image<=grays[thr[0]])] = avg[0]
     if(K != 1):
         for i in range(1, K):
