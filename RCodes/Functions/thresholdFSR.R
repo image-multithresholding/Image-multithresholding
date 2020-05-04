@@ -9,11 +9,11 @@
 # k number of classes that must be odd
 
 # Value:
-# thresholFSR returns a list with class "numeric" 
+# thresholdFSR returns a list with class "numeric" 
 
 ############################################################################################
 
-thresholFSR <- function(img, k){
+thresholdFSR <- function(img, k){
   
   # Find the gray values
   
