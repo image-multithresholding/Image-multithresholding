@@ -103,10 +103,12 @@ PSNR returns an object with type class 'numpy.float64'
     image = np.copy(img)
     thresholdedImage = np.copy(thImg)
 
+    # YA ESTÁN EN EL FORMATO NECESARIO
+    
     # Convert images to appropiate data type
 
-    image = np.asarray(image, dtype=np.int32)
-    thresholdedImage = np.asarray(thresholdedImage, dtype=np.int32)
+    #image = np.asarray(image, dtype=np.int32)
+    #thresholdedImage = np.asarray(thresholdedImage, dtype=np.int32)
 
     # Checking if the images shape match
 
@@ -116,7 +118,7 @@ PSNR returns an object with type class 'numpy.float64'
     
     # Compute the root mean-squared error (RMSE)
 
-    rmse = sqrt(np.mean((image - thresholdedImage) ** 2))
+    rmse = np.sqrt(np.mean((image - thresholdedImage) ** 2))
 
     # Compute the peak signal to noise ratio (PSNR)
 
