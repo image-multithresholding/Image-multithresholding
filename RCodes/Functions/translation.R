@@ -1,35 +1,32 @@
 ############################################################################################
 
-## Axesion transformation
+## Translation transformation
 
 ############################################################################################
 
 # Arguments:
-# x vector to which apply axesion transformation
-# axesionFactor value for the axesion factor
+# x1 vector to which apply translation transformation
+# x0 vector in the previous iteration 
+# translationFactor value for the translation factor
 
 # Value:
-# axesion returns an objet with class "matrix" 
+# translation returns an objet with class "matrix" 
 
 ############################################################################################
 
-axesion <- function(x, axesionFactor){
+translation <- function(x1, x0, translationFactor){
   
   # Find the amount of variables
   
-  n <- length(x)
+  n <- length(x1)
   
-  # Find random diagonal matrix with elements obeying the Gaussian distributions and only one
-  # random position having nonzero value
+  # Find a random variable in [0,1]
   
-  mat <- matrix(0, nrow = n, ncol = n)
-  position <- sample(1:n, 1)
-  value <- rnorm(1)
-  mat[position,position] <- value
+  mat <- runif(1)
   
-  # Apply axesion transformation
+  # Apply translation transformation
   
-  y <- x + axesionFactor * mat %*% matrix(x)
+  y <- x + translationFactor * mat * matrix(x1-x0)/norm(x1-x0, type="2")
   
   # Output
   
