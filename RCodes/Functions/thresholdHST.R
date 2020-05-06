@@ -71,7 +71,7 @@ thresholdHST <- function(img, k){
   # Find the intersections
   
   for (i in 1:m){
-    intersection[[i]] <- intersect(valleys, intRegions[[i]])
+    intersection[[i]] <- intersect(valPosition, intRegions[[i]])
   }
   
   # Initialize 
