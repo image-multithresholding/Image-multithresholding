@@ -104,9 +104,13 @@ thresholdGAA <- function(img, k, iter=100, populationSize=10, crossoverRate=0.95
       # Apply croosover
       
       if (rand < crossoverRate) {
-        position <- floor(runif(1,1,bits*(k-1)))
+        position <- floor(runif(1,1,bits*(k-1)-1))
         newChromo1 <- crossover(chromo1, chromo2, position)[1,]
         newChromo2 <- crossover(chromo1, chromo2, position)[2,]
+      }
+      else{
+        newChromo1 <- chromo1
+        newChromo2 <- chromo2
       }
       
       # Apply mutation
