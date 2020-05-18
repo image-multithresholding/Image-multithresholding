@@ -142,19 +142,23 @@ thresholdLRA <- function(img, k, n, m){
   
   # Find first valley
   
-  valley <- sort(as.vector(cells[peakLocation[1]:peakLocation[2],]))
+  if (length(peakLocation) == 1){
+    valley <- as.vector(cells[peakLocation,])
+  } else{
+   valley <- sort(as.vector(cells[peakLocation[1]:peakLocation[2],]))
+  }
   
   # Find first threshold
   
-  if (n ==2 & m == 2){
+  if (n == 2 & m == 2){
     thr[1] <- argminRF22(valley, freq[valley])
   }
   
-  if (n ==2 & m == 3){
+  if (n == 2 & m == 3){
     thr[1] <- argminRF23(valley, freq[valley])
   }
   
-  if (n ==3 & m == 2){
+  if (n == 3 & m == 2){
     thr[1] <- argminRF32(valley, freq[valley])
   }
   
@@ -162,7 +166,13 @@ thresholdLRA <- function(img, k, n, m){
   
   if (k != 2){
     for (i in 2:(k-1)){
-      valley <- sort(as.vector(cells[(peakLocation[i]+1):peakLocation[i+1],]))
+      
+      if (length(peakLocation) == k-1){
+        valley <- as.vector(cells[peakLocation[i]+1,])
+      }
+      else{
+        valley <- sort(as.vector(cells[(peakLocation[i]+1):peakLocation[i+1],]))
+      }
       
       if (n ==2 & m == 2){
         thr[i] <- argminRF22(valley, freq[valley])
