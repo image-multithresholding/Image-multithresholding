@@ -167,7 +167,7 @@ thresholdLRA <- function(img, k, n, m){
   if (k != 2){
     for (i in 2:(k-1)){
       
-      if (length(peakLocation) == k-1){
+      if (length(peakLocation) == i){
         valley <- as.vector(cells[peakLocation[i]+1,])
       }
       else{
