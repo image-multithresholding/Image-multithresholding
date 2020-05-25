@@ -1,7 +1,6 @@
 from skimage import exposure
 import numpy as np
 import numpy.ma as ma
-from math import sqrt
 
 def thresholdedImage(img, thr):
     
@@ -114,3 +113,20 @@ PSNR returns an object with type class 'numpy.float64'
     psnr = 20 * np.log10(np.max(img) / rmse)
 
     return psnr
+
+def imageHistogram(img):
+    
+    """
+Build the histogram of the gray levels of a given image 
+
+Arguments:
+img a "numpy.ndarray" object 
+
+Value:
+imageHistogram returns a list with class "data.frame" containing the following components:
+grays
+gray level
+freq
+frequency of the gray level
+"""
+    pass
