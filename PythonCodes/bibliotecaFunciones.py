@@ -1,14 +1,13 @@
 from skimage import exposure
 import numpy as np
-import numpy.ma as ma
+from typing import List
 
-def thresholdedImage(img, thr):
-    
-    """
+def thresholded_image(img: np.ndarray, thr: List[int]) -> np.ndarray:
+"""
 thresholdedImage function
 
 Arguments:
-img a "numpy.ndarray" object
+img a numpy.ndarray object representing an image
 thr a list of thresholds
 
 Value:
@@ -76,14 +75,13 @@ thresholdingImage returns an object with class "numpy.ndarray" and possible valu
 
 
 
-def PSNR(img, thImg):
-
-    """
+def PSNR(img: np.ndarray, thImg: np.ndarray) -> np.float64:
+"""
 Compute the peak signal to noise ratio (PSNR) measured in decibel (dB) of a thersholded 
 image
 
 Arguments:
-img a "numpy.ndarray" object
+img a "numpy.ndarray" object representing an image
 thImg a thresholded image of img, a "numpy.ndarray" object
 
 Value:
@@ -114,9 +112,8 @@ PSNR returns an object with type class 'numpy.float64'
 
     return psnr
 
-def imageHistogram(img):
-    
-    """
+def image_histogram(img):
+"""
 Build the histogram of the gray levels of a given image 
 
 Arguments:
@@ -130,3 +127,4 @@ freq
 frequency of the gray level
 """
     pass
+
