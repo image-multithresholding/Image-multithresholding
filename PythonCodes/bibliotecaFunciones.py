@@ -3,18 +3,17 @@ import numpy as np
 from typing import List
 
 def thresholded_image(img: np.ndarray, thr: List[int]) -> np.ndarray:
-"""
-thresholdedImage function
+    """
+    thresholdedImage function
 
-Arguments:
-img a numpy.ndarray object representing an image
-thr a list of thresholds
+    Arguments:
+    img a numpy.ndarray object representing an image
+    thr a list of thresholds
 
-Value:
-thresholdingImage returns an object with class "numpy.ndarray" and possible values 0,1,...,255
+    Value:
+    thresholdingImage returns an object with class "numpy.ndarray" and possible values 0,1,...,255
 
-"""
-
+    """
     image = np.copy(img)
 
     #Convert threshold to numpy array
@@ -76,25 +75,25 @@ thresholdingImage returns an object with class "numpy.ndarray" and possible valu
 
 
 def PSNR(img: np.ndarray, thImg: np.ndarray) -> np.float64:
-"""
-Compute the peak signal to noise ratio (PSNR) measured in decibel (dB) of a thersholded 
-image
+    """
+    Compute the peak signal to noise ratio (PSNR) measured in decibel (dB) of a thersholded 
+    image
 
-Arguments:
-img a "numpy.ndarray" object representing an image
-thImg a thresholded image of img, a "numpy.ndarray" object
+    Arguments:
+    img a "numpy.ndarray" object representing an image
+    thImg a thresholded image of img, a "numpy.ndarray" object
 
-Value:
-PSNR returns an object with type class 'numpy.float64'
-"""
+    Value:
+    PSNR returns an object with type class 'numpy.float64'
+    """
 
     image = np.copy(img)
-    thresholdedImage = np.copy(thImg)
+    thresholded_image = np.copy(thImg)
 
     # Convert images to appropiate data type
 
     image = np.asarray(image, dtype=np.int32)
-    thresholdedImage = np.asarray(thresholdedImage, dtype=np.int32)
+    thresholded_image = np.asarray(thresholded_image, dtype=np.int32)
 
     # Checking if the images shape match
 
@@ -113,18 +112,19 @@ PSNR returns an object with type class 'numpy.float64'
     return psnr
 
 def image_histogram(img):
-"""
-Build the histogram of the gray levels of a given image 
+    """
+    Build the histogram of the gray levels of a given image 
 
-Arguments:
-img a "numpy.ndarray" object 
+    Arguments:
+    img a "numpy.ndarray" object
 
-Value:
-imageHistogram returns a list with class "data.frame" containing the following components:
-grays
-gray level
-freq
-frequency of the gray level
-"""
+    Value:
+    imageHistogram returns a list with class "data.frame" containing the following components:
+    grays
+    gray level
+    freq
+    frequency of the gray level
+    """
     pass
 
+def image_probabilities()
