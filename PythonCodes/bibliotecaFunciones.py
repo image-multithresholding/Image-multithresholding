@@ -1,6 +1,5 @@
 from skimage import exposure
 import numpy as np
-import numpy.ma as ma
 
 def thresholdedImage(img, thr):
     
@@ -123,10 +122,20 @@ Arguments:
 img a "numpy.ndarray" object 
 
 Value:
-imageHistogram returns a list with class "data.frame" containing the following components:
-grays
-gray level
-freq
-frequency of the gray level
+imageHistogram returns a tuple with two lists containing the following components respectively:
+grays = gray levels
+freq = frequency of the gray levels
 """
-    pass
+    image = np.copy(img)
+
+    # Find and sort gray levels and frequency
+    
+    grays, freq = np.unique(image.flatten(), return_counts=True)
+
+    # Join gray levels with frequency
+
+    hist = grays, freq
+
+    return hist
+
+    
