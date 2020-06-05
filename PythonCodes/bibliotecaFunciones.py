@@ -1,6 +1,6 @@
 from skimage import exposure
 import numpy as np
-from typing import List
+from typing import List, Dict
 
 def thresholded_image(img: np.ndarray, thr: List[int]) -> np.ndarray:
     """
@@ -127,4 +127,17 @@ def image_histogram(img):
     """
     pass
 
-def image_probabilities()
+def image_probabilities(img: np.ndarray) -> Dict[int, float]:
+
+    probabilities = dict()
+
+    # Get the histogram for the given image.
+    histogram = image_histogram(img)
+
+    # Calculate the probability of each gray level
+    for data_frame in histogram:
+        probabilities[data_frame.grays] = data_frame.freq / img.size
+    
+    return probabilities
+
+def gray_clustering()
