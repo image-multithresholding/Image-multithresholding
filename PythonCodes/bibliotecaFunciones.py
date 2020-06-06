@@ -128,16 +128,27 @@ def image_histogram(img):
     pass
 
 def image_probabilities(img: np.ndarray) -> Dict[int, float]:
-
     probabilities = dict()
 
     # Get the histogram for the given image.
     histogram = image_histogram(img)
 
-    # Calculate the probability of each gray level
+    # Calculate the probability of each gray level.
     for data_frame in histogram:
         probabilities[data_frame.grays] = data_frame.freq / img.size
     
     return probabilities
 
-def gray_clustering()
+def gray_clustering(levels: int, breakPositions: List[int], levelsOffset: int = 0) -> List[List[int]]:
+    clusters = [[]]
+
+    # Iterate over every level.
+    for x in range(levelsOffset, levelsOffset + levels):
+        # If we have to break at this level, start a new list.
+        if x in breakPositions:
+            clusters.append([x])
+        # If not, just add this level to the last created cluster.
+        else:
+            clusters[-1].append(x)
+    
+    return clusters
