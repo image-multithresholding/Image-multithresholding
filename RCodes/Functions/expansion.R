@@ -21,7 +21,11 @@ expansion <- function(x, expansionFactor){
   
   # Find random diagonal matrix with elements obeying the Gaussian distribution
   
-  mat <- diag(rnorm(n))
+  if (n == 1){
+    mat <- rnorm(n)
+  } else {
+    mat <- diag(rnorm(n))
+  }
   
   # Apply expansion transformation
   

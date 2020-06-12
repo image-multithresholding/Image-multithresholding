@@ -8,7 +8,7 @@
 # Arguments:
 # img an cimg object
 # k number of classes
-# iter number of iterations, 100 by default
+# iter number of iterations, 200 by default
 # populationSize number of initial populatio, 10 by default
 # crossoverRate fraction to replace by crossover, 0.95 by default
 # mutationRate fraction to replace by mutation, 0.05 by default
@@ -18,7 +18,7 @@
 
 ############################################################################################
 
-thresholdGAA <- function(img, k, iter=100, populationSize=10, crossoverRate=0.95, mutationRate=0.05){
+thresholdGAA <- function(img, k, iter=200, populationSize=10, crossoverRate=0.95, mutationRate=0.05){
   
   # Find the vector of frequencies of the gray leves 0,1,...,L-1
   
