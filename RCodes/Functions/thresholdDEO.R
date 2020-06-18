@@ -46,7 +46,7 @@ thresholdDEO <- function(img, k, iter=1000, numberPop=40, mutationFactor=0.5,
     }
   }
   
-  # Order thresold candidates
+  # Sort thresold candidates
   
   for (i in 1:numberPop){
     solutions[i,] <- sort(solutions[i,])
@@ -121,7 +121,7 @@ thresholdDEO <- function(img, k, iter=1000, numberPop=40, mutationFactor=0.5,
       mutantVector[i,] <- round(bestSolution + mutationFactor * (solutions[pos1[i],]-solutions[pos2[i],]))
     }
     
-    # Order thresold candidates
+    # Sort thresold candidates
     
     for (i in 1:numberPop){
       mutantVector[i,] <- sort(mutantVector[i,])

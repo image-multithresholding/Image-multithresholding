@@ -49,7 +49,7 @@ thresholdPSO <- function(img, k, iter=10, numberPart=40){
     }
   }
   
-  # Order thresold candidates
+  # Sort thresold candidates
   
   for (i in 1:numberPart){
     particlePosition[i,] <- sort(particlePosition[i,])
@@ -121,7 +121,7 @@ thresholdPSO <- function(img, k, iter=10, numberPart=40){
       }
     }
     
-    # Order thresholds
+    # Sort thresholds
     
     for (i in 1:numberPart){
       newParticlePosition[i,] <- sort(newParticlePosition[i,])

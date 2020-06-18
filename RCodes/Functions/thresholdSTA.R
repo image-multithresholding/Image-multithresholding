@@ -53,7 +53,7 @@ thresholdSTA <- function(img, k, iter=10, maxRotationFactor=1, minRotationFactor
     }
   }
   
-  # Order thresold candidates
+  # Sort thresold candidates
   
   for (i in 1:searchEnforcement){
     solutions[i,] <- sort(solutions[i,])
@@ -84,7 +84,7 @@ thresholdSTA <- function(img, k, iter=10, maxRotationFactor=1, minRotationFactor
       
       state <- round(expansion(oldState, expansionFactor))
       
-      # Order thresold candidates
+      # Sort thresold candidates
       
       state <- sort(state)
       
@@ -126,7 +126,7 @@ thresholdSTA <- function(img, k, iter=10, maxRotationFactor=1, minRotationFactor
           newState <- state
         }
         
-        # Order thresold candidates
+        # Sort thresold candidates
         
         newState <- sort(newState)
         
@@ -168,7 +168,7 @@ thresholdSTA <- function(img, k, iter=10, maxRotationFactor=1, minRotationFactor
         state <- oldState
       }
       
-      # Order thresold candidates
+      # Sort thresold candidates
       
       state <- sort(state)
       
@@ -206,7 +206,7 @@ thresholdSTA <- function(img, k, iter=10, maxRotationFactor=1, minRotationFactor
           newState <- state
         }
         
-        # Order thresold candidates
+        # Sort thresold candidates
         
         newState <- sort(newState)
         
@@ -243,7 +243,7 @@ thresholdSTA <- function(img, k, iter=10, maxRotationFactor=1, minRotationFactor
       
       state <- round(axesion(oldState, axesionFactor))
       
-      # Order thresold candidates
+      # Sort thresold candidates
       
       state <- sort(state)
       
@@ -287,7 +287,7 @@ thresholdSTA <- function(img, k, iter=10, maxRotationFactor=1, minRotationFactor
           newState <- state
         }
         
-        # Order thresold candidates
+        # Sort thresold candidates
         
         newState <- sort(newState)
         # Find new fitness
