@@ -18,16 +18,12 @@ totalCorrelation <- function(prob, levels){
   
   # Find the probabilities according to the given levels
   
-  p <- probUpToLevel(prob, levels)
+  p <- probUpToLevel(prob, levels-1)
   
   # Find the number of breaks and probabilities
   
   n <- length(levels)
   m <- length(prob)
-  
-  # Shift levels to start in 1
-  
-  levels <- levels+1
   
   # Initialize
   
@@ -60,4 +56,9 @@ totalCorrelation <- function(prob, levels){
   
   return(TC)
 }
+
+
+
+
+
 
