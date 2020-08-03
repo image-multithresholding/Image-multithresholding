@@ -144,9 +144,9 @@ def cluster_mean(prob: List[float], clust: List[int], start: int) -> float:
 Compute the mean of a given cluster 
 
 Arguments:
-prob the probability list of gray levels
-clust a cluster of the gray levels
-start 0 or 1 for gray levels 0,...,L-1 or 1,...,L, respectively 
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+clust a cluster of the gray levels (list of elements of class int)
+start 0 or 1 (int) for gray levels 0,...,L-1 or 1,...,L, respectively 
 
 Value:
 cluster_mean returns an object with class float
@@ -157,7 +157,7 @@ cluster_mean returns an object with class float
     clusterProb = 0
 
     # Compute the expected value of each element in the cluster
-    # and Compute the cluster probability
+    # and compute the cluster probability
 
     if(start == 0):
         for grayLevel in clust:
@@ -171,6 +171,47 @@ cluster_mean returns an object with class float
 
     # Compute the cluster mean
 
-    cm = sum(term) / clusterProb
+    clusterMean = sum(term) / clusterProb
 
-    return cm
+    return clusterMean
+
+
+def cluster_var(prob: List[float], clust: List[int], start: int) -> float:
+    """
+Compute the variance of a given cluster 
+
+Arguments:
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+clust a cluster of the gray levels (list of elements of class int)
+start 0 or 1 (int) for gray levels 0,...,L-1 or 1,...,L, respectively 
+
+Value:
+cluster_mean returns an object with class float
+"""
+    #Initialize term list and cluster prbability accumulator
+
+    term = list()
+    clusterProb = 0
+
+    # Compute the cluster mean
+    
+    clusterMean = cluster_mean(prob, clust, start)
+
+    # Compute the variance of each element in the cluster
+    # and compute the cluster probability
+
+    if(start == 0):
+        for grayLevel in clust:
+            term.append(((grayLevel - clusterMean) ** 2) * prob[grayLevel])
+            clusterProb += prob[grayLevel]
+
+    if(start == 1):
+        for grayLevel in clust:
+            term.append(((grayLevel - clusterMean) ** 2)* prob[grayLevel - 1]) 
+            clusterProb = prob[grayLevel - 1]
+
+    # Compute the variance of the cluster
+
+    clusterVariance = sum(term) / clusterProb
+
+    return clusterVariance
