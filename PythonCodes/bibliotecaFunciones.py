@@ -114,7 +114,7 @@ PSNR returns an object with type class 'numpy.float64'
 
     return psnr
 
-def image_histogram(img: np.ndarray) -> List[int]:
+def image_histogram(img: np.ndarray) -> Dict[int, int]:
     
     """
 Build the histogram of the gray levels of a given image 
@@ -123,14 +123,54 @@ Arguments:
 img a "numpy.ndarray" object 
 
 Value:
-image_histogram returns a list of integers (freq) containing the frequency of the gray levels
+image_histogram returns a dictionary with gray levels frequencies
+
 """
     image = np.copy(img)
 
     # Find and sort gray levels and frequency
     
-    _, freq = np.unique(image.flatten(), return_counts=True)
+    grays, freq = np.unique(image.flatten(), return_counts=True)
 
-    return freq
+    #Create histogram dictionary
+
+    histogram = dict(list(zip(grays, freq)))
+
+    return histogram
 
     
+def cluster_mean(prob: List[float], clust: List[int], start: int) -> float:
+    """
+Compute the mean of a given cluster 
+
+Arguments:
+prob the probability list of gray levels
+clust a cluster of the gray levels
+start 0 or 1 for gray levels 0,...,L-1 or 1,...,L, respectively 
+
+Value:
+cluster_mean returns an object with class float
+"""
+    #Initialize term list and cluster prbability accumulator
+
+    term = list()
+    clusterProb = 0
+
+    # Compute the expected value of each element in the cluster
+    # and Compute the cluster probability
+
+    if(start == 0):
+        for grayLevel in clust:
+            term.append(grayLevel * prob[grayLevel])
+            clusterProb += prob[grayLevel]
+
+    if(start == 1):
+        for grayLevel in clust:
+            term.append(grayLevel * prob[grayLevel - 1]) 
+            clusterProb = prob[grayLevel - 1]
+
+    # Compute the cluster mean
+
+    cm = sum(term) / clusterProb
+
+    return cm
