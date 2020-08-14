@@ -159,15 +159,9 @@ cluster_mean returns an object with class float
     # Compute the expected value of each element in the cluster
     # and compute the cluster probability
 
-    if(start == 0):
-        for grayLevel in clust:
-            term.append(grayLevel * prob[grayLevel])
-            clusterProb += prob[grayLevel]
-
-    if(start == 1):
-        for grayLevel in clust:
-            term.append(grayLevel * prob[grayLevel - 1]) 
-            clusterProb = prob[grayLevel - 1]
+    for grayLevel in clust:
+        term.append(grayLevel * prob[grayLevel - start]) 
+        clusterProb += prob[grayLevel - start]
 
     # Compute the cluster mean
 
@@ -200,18 +194,15 @@ cluster_mean returns an object with class float
     # Compute the variance of each element in the cluster
     # and compute the cluster probability
 
-    if(start == 0):
-        for grayLevel in clust:
-            term.append(((grayLevel - clusterMean) ** 2) * prob[grayLevel])
-            clusterProb += prob[grayLevel]
-
-    if(start == 1):
-        for grayLevel in clust:
-            term.append(((grayLevel - clusterMean) ** 2)* prob[grayLevel - 1]) 
-            clusterProb = prob[grayLevel - 1]
+    for grayLevel in clust:
+        term.append(((grayLevel - clusterMean) ** 2)* prob[grayLevel - start]) 
+        clusterProb += prob[grayLevel - start]
 
     # Compute the variance of the cluster
 
     clusterVariance = sum(term) / clusterProb
 
     return clusterVariance
+
+
+def prob_up_to_level(prob: List[float], )
