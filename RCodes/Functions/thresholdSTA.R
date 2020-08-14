@@ -7,7 +7,7 @@
 # Arguments:
 # img an cimg object
 # k number of classes
-# iter number of iterations, 500 by default
+# iter number of iterations, 10 by default
 # maxRotationFactor maximum value for the rotation factor, 1 by default
 # minRotationFactor minimum value for the rotation factor, 0.0001 by default
 # tranlationFactor value for the translation factor, 1 by default
@@ -22,9 +22,9 @@
 
 ############################################################################################
 
-thresholdSTA <- function(img, k, iter=500, maxRotationFactor=1, minRotationFactor=0.0001, 
+thresholdSTA <- function(img, k, iter=10, maxRotationFactor=1, minRotationFactor=0.0001, 
                          translationFactor=1, expansionFactor=1, axesionFactor=1,
-                         lesseningCoef=2, searchEnforcement=30, penalty=10){
+                         lesseningCoef=2, searchEnforcement=30){
   
   # Find the vector of probabilities of the gray leves 0,1,...,L-1
   
@@ -34,24 +34,34 @@ thresholdSTA <- function(img, k, iter=500, maxRotationFactor=1, minRotationFacto
   
   L <- length(prob)
   
-  # Find number of parameters
+  ## Fix parameter bounds
   
-  numberParam <- 3*k
+  minThr <- 0
+  maxThr <- L-1
   
   # Generate an initial random solution
   
-  prioriProb <- matrix(0, nrow=searchEnforcement, ncol=k)
+  # Initialize
+  
+  solutions <- matrix(0, nrow=searchEnforcement, ncol=k-1)
+  
+  # Generate an initial random solution
+  
   for (i in 1:searchEnforcement){
-    prioriProb[i,] <- runif(k)
-    prioriProb[i,] <- prioriProb[i,]/sum(prioriProb[i,])
+    for (j in 1:(k-1)){
+      solutions[i,j] <- round(minThr + runif(1)*(maxThr-minThr))
+    }
   }
-  means <- matrix(runif(searchEnforcement*k, 0, L-1), nrow = searchEnforcement)
-  vars <- matrix(runif(searchEnforcement*k, 0, 100), nrow = searchEnforcement)
+  
+  # Sort thresold candidates
+  
+  for (i in 1:searchEnforcement){
+    solutions[i,] <- sort(solutions[i,])
+  }
   
   # Initialize
   
   counter <- 0
-  solutions <- cbind(prioriProb, means, vars)
   rotationFactor <- runif(1)
   
   # Repetition cycle
@@ -72,16 +82,35 @@ thresholdSTA <- function(img, k, iter=500, maxRotationFactor=1, minRotationFacto
       
       # Apply expansion translation
       
-      state <- expansion(oldState, expansionFactor)
+      state <- round(expansion(oldState, expansionFactor))
       
-      # Find fitting errors
+      # Sort thresold candidates
       
-      oldStateError <- objectiveError(prob, oldState[1:k], oldState[(k+1):(2*k)], oldState[(2*k+1):(3*k)], penalty)
-      stateError <- objectiveError(prob, state[1:k], state[(k+1):(2*k)], state[(2*k+1):(3*k)], penalty)
+      state <- sort(state)
       
-      # Compare errors
+      # Fix in order to keep stablished ranks
       
-      if(is.na(stateError) == FALSE & stateError < oldStateError){
+      if (length(which(state < minThr))>0 | length(which(state > maxThr))>0){
+          state <- oldState
+      }
+    
+      # Find fitting function
+      
+      if (length(unique(oldState)) == k-1 & oldState[1] != 0 & oldState[k-1] != L-1){
+        oldStateFit <- betweenClassVar(prob, oldState)
+      } else {
+        oldStateFit <- 0
+      }
+    
+      if (length(unique(state)) == k-1 & state[1] != 0 & state[k-1] != L-1){
+        stateFit <- betweenClassVar(prob, state)
+      } else {
+        stateFit <- 0
+      }
+    
+      # Compare fitness
+      
+      if(stateFit > oldStateFit){
         
         # Update
         
@@ -89,15 +118,29 @@ thresholdSTA <- function(img, k, iter=500, maxRotationFactor=1, minRotationFacto
         
         # Apply translation transformation
         
-        newState <- translation(state, oldState, translationFactor)
+        newState <- round(translation(state, oldState, translationFactor))
         
-        # Find new error
+        # Fix in order to keep stablished ranks
         
-        newStateError <- objectiveError(prob, newState[1:k], newState[(k+1):(2*k)], newState[(2*k+1):(3*k)], penalty)
+        if (length(which(newState < minThr))>0 | length(which(newState > maxThr))>0){
+          newState <- state
+        }
         
-        # Compare errors
+        # Sort thresold candidates
         
-        if(is.na(newStateError) == FALSE & newStateError < stateError){
+        newState <- sort(newState)
+        
+        # Find new fitness
+        
+        if (length(unique(newState)) == k-1 & newState[1] != 0 & newState[k-1] != L-1){
+          newStateFit <- betweenClassVar(prob, newState)
+        } else {
+          newStateFit <- 0
+        }
+        
+        # Compare fitness
+        
+        if(newStateFit > stateFit){
         
           # Update
           
@@ -117,16 +160,37 @@ thresholdSTA <- function(img, k, iter=500, maxRotationFactor=1, minRotationFacto
       
       # Apply rotation translation
       
-      state <- rotation(oldState, rotationFactor)
+      state <- round(rotation(oldState, rotationFactor))
       
-      # Find fitting errors
+      # Fix in order to keep stablished ranks
       
-      oldStateError <- objectiveError(prob, oldState[1:k], oldState[(k+1):(2*k)], oldState[(2*k+1):(3*k)], penalty)
-      stateError <- objectiveError(prob, state[1:k], state[(k+1):(2*k)], state[(2*k+1):(3*k)], penalty)
+      if (length(which(state < minThr))>0 | length(which(state > maxThr))>0){
+        state <- oldState
+      }
+      
+      # Sort thresold candidates
+      
+      state <- sort(state)
+      
+      # Find fitting function
+      
+      if (length(unique(oldState)) == k-1 & oldState[1] != 0 & oldState[k-1] != L-1){
+        oldStateFit <- betweenClassVar(prob, oldState)
+      }
+      else{
+        oldStateFit <- 0
+      }
+      
+      if (length(unique(state)) == k-1 & state[1] != 0 & state[k-1] != L-1){
+        stateFit <- betweenClassVar(prob, state)
+      }
+      else{
+        stateFit <- 0
+      }
       
       # Compare errors
       
-      if(is.na(stateError) == FALSE & stateError < oldStateError){
+      if(stateFit > oldStateFit){
         
         # Update
         
@@ -134,15 +198,30 @@ thresholdSTA <- function(img, k, iter=500, maxRotationFactor=1, minRotationFacto
         
         # Apply translation transformation
         
-        newState <- translation(state, oldState, translationFactor)
+        newState <- round(translation(state, oldState, translationFactor))
         
-        # Find new error
+        # Fix in order to keep stablished ranks
         
-        newStateError <- objectiveError(prob, newState[1:k], newState[(k+1):(2*k)], newState[(2*k+1):(3*k)], penalty)
+        if (length(which(newState < minThr))>0 | length(which(newState > maxThr))>0){
+          newState <- state
+        }
         
-        # Compare errors
+        # Sort thresold candidates
         
-        if(is.na(newStateError) == FALSE & newStateError < stateError){
+        newState <- sort(newState)
+        
+        # Find new fitness
+        
+        if (length(unique(newState)) == k-1 & newState[1] != 0 & newState[k-1] != L-1){
+          newStateFit <- betweenClassVar(prob, newState)
+        }
+        else{
+          newStateFit <- 0
+        }
+        
+        # Compare fitness
+        
+        if(newStateFit > stateFit){
           
           # Update
           
@@ -150,7 +229,8 @@ thresholdSTA <- function(img, k, iter=500, maxRotationFactor=1, minRotationFacto
         }
       }
     }
-    
+
+
     # Apply axesion transformation 
     
     for (i in 1:searchEnforcement){
@@ -161,16 +241,37 @@ thresholdSTA <- function(img, k, iter=500, maxRotationFactor=1, minRotationFacto
       
       # Apply axesion translation
       
-      state <- axesion(oldState, axesionFactor)
+      state <- round(axesion(oldState, axesionFactor))
       
-      # Find fitting errors
+      # Sort thresold candidates
       
-      oldStateError <- objectiveError(prob, oldState[1:k], oldState[(k+1):(2*k)], oldState[(2*k+1):(3*k)], penalty)
-      stateError <- objectiveError(prob, state[1:k], state[(k+1):(2*k)], state[(2*k+1):(3*k)], penalty)
+      state <- sort(state)
       
-      # Compare errors
+      # Fix in order to keep stablished ranks
       
-      if(is.na(stateError) == FALSE & stateError < oldStateError){
+      if (length(which(state < minThr))>0 | length(which(state > maxThr))>0){
+        state <- oldState
+      }
+      
+      # Find fitting function
+      
+      if (length(unique(oldState)) == k-1 & oldState[1] != 0 & oldState[k-1] != L-1){
+        oldStateFit <- betweenClassVar(prob, oldState)
+      }
+      else{
+        oldStateFit <- 0
+      }
+      
+      if (length(unique(state)) == k-1 & state[1] != 0 & state[k-1] != L-1){
+        stateFit <- betweenClassVar(prob, state)
+      }
+      else{
+        stateFit <- 0
+      }
+      
+      # Compare fitness
+      
+      if(stateFit > oldStateFit){
         
         # Update
         
@@ -178,15 +279,29 @@ thresholdSTA <- function(img, k, iter=500, maxRotationFactor=1, minRotationFacto
         
         # Apply translation transformation
         
-        newState <- translation(state, oldState, translationFactor)
+        newState <- round(translation(state, oldState, translationFactor))
         
-        # Find new error
+        # Fix in order to keep stablished ranks
         
-        newStateError <- objectiveError(prob, newState[1:k], newState[(k+1):(2*k)], newState[(2*k+1):(3*k)], penalty)
+        if (length(which(newState < minThr))>0 | length(which(newState > maxThr))>0){
+          newState <- state
+        }
         
-        # Compare errors
+        # Sort thresold candidates
         
-        if(is.na(newStateError) == FALSE & newStateError < stateError){
+        newState <- sort(newState)
+        # Find new fitness
+        
+        if (length(unique(newState)) == k-1 & newState[1] != 0 & newState[k-1] != L-1){
+          newStateFit <- betweenClassVar(prob, newState)
+        }
+        else{
+          newStateFit <- 0
+        }
+        
+        # Compare fitness
+        
+        if(newStateFit > stateFit){
           
           # Update
           
@@ -208,76 +323,25 @@ thresholdSTA <- function(img, k, iter=500, maxRotationFactor=1, minRotationFacto
   
   # Initialize
   
-  fittingError <- vector()
+  fitness <- vector()
   
-  # Find overall fitting error
+  # Find overall fitness
   
   for (i in 1:searchEnforcement){
-    fittingError[i] <- objectiveError(prob, solutions[i,1:k], solutions[i,(k+1):(2*k)], solutions[i,(2*k+1):(3*k)], penalty)
+    fitness[i] <- betweenClassVar(prob, solutions[i,])
   }
   
-  # Find best error
+  # Find best fitness
   
-  bestError <- min(fittingError)
+  bestFit <- max(fitness)
   
   # Find best state
   
-  bestState <- c(solutions[which(fittingError == bestError),])
+  bestState <- solutions[min(which(fitness == bestFit)),]
   
-  # Order the means
+  # Find thresholds
   
-  orderMeans <- sort(bestState[(k+1):(2*k)])
-  
-  # Initialize
-  
-  orderPos <- vector()
-  
-  # Find positions according to mean order
-  
-  for (i in 1:length(orderMeans)){
-    orderPos[i] <- which(bestState[(k+1):(2*k)] == orderMeans[i])
-  }
-  
-  # Initialize
-  
-  orderBestState <- vector()
-  
-  # Order the classes according to order means
-  
-  for (i in 1:k){
-    orderBestState[i] <- bestState[orderPos[i]]
-  }
-  
-  for (i in 1:k){
-    orderBestState[k+i] <- bestState[k+orderPos[i]]
-  }
-  
-  for (i in 1:k){
-    orderBestState[2*k+i] <- bestState[2*k+orderPos[i]]
-  }
-  
-  # Find optimum coefficients
-  
-  optCoef <- optimumCoef(orderBestState[1:k], orderBestState[(k+1):(2*k)], 
-                         orderBestState[(2*k+1):(3*k)])
-  
-  # Initialize
-  
-  thr <- matrix(0, nrow=k-1, ncol=2)
-  
-  # Find solutions of the optimization quadratic
-  
-  for (i in 1:(k-1)){
-    thr[i,] <- quadraticSolve(optCoef[i,1], optCoef[i,2], optCoef[i,3])
-  }
-  
-  # Convert to integer
-  
-  thr <- as.vector(round(thr,0))
-  
-  # Order only posible solutions
-  
-  thr <- sort(thr[thr>0 & thr<255])
+  thr <- bestState
   
   # Output 
   

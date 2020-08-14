@@ -26,7 +26,7 @@ translation <- function(x1, x0, translationFactor){
   
   # Apply translation transformation
   
-  y <- x + translationFactor * mat * matrix(x1-x0)/norm(x1-x0, type="2")
+  y <- x1 + translationFactor * mat * matrix(x1-x0)/norm(x1-x0, type="2")
   
   # Output
   

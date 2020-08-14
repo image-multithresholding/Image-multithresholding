@@ -17,16 +17,12 @@ totalEntropy <- function(prob, levels){
   
   # Find the probabilities according to the given levels
   
-  p <- probUpToLevel(prob, levels)
+  p <- probUpToLevel(prob, levels-1)
   
   # Find the number of breaks and probabilities
   
   n <- length(levels)
   m <- length(prob)
-  
-  # Shift levels to start in 1
-  
-  levels <- levels+1
   
   # Initialize
   
@@ -36,19 +32,19 @@ totalEntropy <- function(prob, levels){
     
     # Find the entropy of both intervals
     
-    E[1] <- -sum(prob[1:levels]*log(prob[1:levels]))/p[1]
-    E[2] <- -sum(prob[(levels+1):m]*log(prob[(levels+1):m]))/p[2]
+    E[1] <- -sum(prob[1:levels]*log(prob[1:levels]/p[1]))/p[1]
+    E[2] <- -sum(prob[(levels+1):m]*log(prob[(levels+1):m]/p[2]))/p[2]
    } 
   
   else {
   
   # Find the entropy of each interval
   
-  E[1] <- -sum(prob[1:levels[1]]*log(prob[1:levels[1]]))/p[1]
+  E[1] <- -sum(prob[1:levels[1]]*log(prob[1:levels[1]]/p[1]))/p[1]
   for (i in 2:n){
-    E[i] <- -sum(prob[(levels[i-1]+1):levels[i]]*log(prob[(levels[i-1]+1):levels[i]]))/p[i]
+    E[i] <- -sum(prob[(levels[i-1]+1):levels[i]]*log(prob[(levels[i-1]+1):levels[i]]/p[i]))/p[i]
   }
-  E[n+1] <- -sum(prob[(levels[n]+1):m]*log(prob[(levels[n]+1):m]))/p[n+1]
+  E[n+1] <- -sum(prob[(levels[n]+1):m]*log(prob[(levels[n]+1):m]/p[n+1]))/p[n+1]
   }
   
   # Find the total entropy
