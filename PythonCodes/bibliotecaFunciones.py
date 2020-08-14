@@ -1,6 +1,6 @@
 from skimage import exposure
 import numpy as np
-import numpy.ma as ma
+from typing import List, Dict
 
 def thresholdedImage(img, thr):
     
@@ -114,7 +114,7 @@ PSNR returns an object with type class 'numpy.float64'
 
     return psnr
 
-def imageHistogram(img):
+def image_histogram(img: np.ndarray) -> Dict[int, int]:
     
     """
 Build the histogram of the gray levels of a given image 
@@ -123,10 +123,86 @@ Arguments:
 img a "numpy.ndarray" object 
 
 Value:
-imageHistogram returns a list with class "data.frame" containing the following components:
-grays
-gray level
-freq
-frequency of the gray level
+image_histogram returns a dictionary with gray levels frequencies
+
 """
-    pass
+    image = np.copy(img)
+
+    # Find and sort gray levels and frequency
+    
+    grays, freq = np.unique(image.flatten(), return_counts=True)
+
+    #Create histogram dictionary
+
+    histogram = dict(list(zip(grays, freq)))
+
+    return histogram
+
+    
+def cluster_mean(prob: List[float], clust: List[int], start: int) -> float:
+    """
+Compute the mean of a given cluster 
+
+Arguments:
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+clust a cluster of the gray levels (list of elements of class int)
+start 0 or 1 (int) for gray levels 0,...,L-1 or 1,...,L, respectively 
+
+Value:
+cluster_mean returns an object with class float
+"""
+    #Initialize term list and cluster prbability accumulator
+
+    term = list()
+    clusterProb = 0
+
+    # Compute the expected value of each element in the cluster
+    # and compute the cluster probability
+
+    for grayLevel in clust:
+        term.append(grayLevel * prob[grayLevel - start]) 
+        clusterProb += prob[grayLevel - start]
+
+    # Compute the cluster mean
+
+    clusterMean = sum(term) / clusterProb
+
+    return clusterMean
+
+
+def cluster_var(prob: List[float], clust: List[int], start: int) -> float:
+    """
+Compute the variance of a given cluster 
+
+Arguments:
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+clust a cluster of the gray levels (list of elements of class int)
+start 0 or 1 (int) for gray levels 0,...,L-1 or 1,...,L, respectively 
+
+Value:
+cluster_mean returns an object with class float
+"""
+    #Initialize term list and cluster prbability accumulator
+
+    term = list()
+    clusterProb = 0
+
+    # Compute the cluster mean
+    
+    clusterMean = cluster_mean(prob, clust, start)
+
+    # Compute the variance of each element in the cluster
+    # and compute the cluster probability
+
+    for grayLevel in clust:
+        term.append(((grayLevel - clusterMean) ** 2)* prob[grayLevel - start]) 
+        clusterProb += prob[grayLevel - start]
+
+    # Compute the variance of the cluster
+
+    clusterVariance = sum(term) / clusterProb
+
+    return clusterVariance
+
+
+def prob_up_to_level(prob: List[float], )
