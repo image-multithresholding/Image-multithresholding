@@ -205,4 +205,47 @@ cluster_mean returns an object with class float
     return clusterVariance
 
 
-def prob_up_to_level(prob: List[float], )
+def prob_up_to_level(prob: List[float], levels: List[int]) -> float:
+    """
+Compute a vector of probabilities up to a list of gray levels 
+
+Arguments:
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+levels a list of gray levels which give the breaks 
+
+Value:
+prob_up_to_level returns an object with class 'list', a float elements list
+"""
+    #Check single break value
+
+    if(isinstance(levels, int)):
+        levels = list(levels)
+
+    # Find the amount of levels
+
+    n = len(levels)
+
+    if(n == 0):
+        print("[Error!]: 'levels', list of breaks, is empty") #Error check
+        exit()
+    if(n > len(prob)):
+        print("[Error!]: 'levels', list of breaks, contains more values than the amount of levels in probability list") #Error check
+        exit()
+    # Initialize
+    
+    probUpToLevel = list()
+
+    probUpToLevel.append(sum(prob[0 : levels[0] + 1])) 
+
+    if (n == 1):
+    #Find both probabilities
+        probUpToLevel.append(1 - probUpToLevel[0])
+    else:
+    #Find probabilities up to each level
+        for i in range(1, n):
+            probUpToLevel.append( sum( prob[(levels[i - 1] + 1) : (levels[i] + 1)] ) )
+        
+        probUpToLevel.append(1 - sum(probUpToLevel))
+
+    return probUpToLevel
+
