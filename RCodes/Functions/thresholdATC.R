@@ -7,19 +7,14 @@
 
 # Arguments:
 # img an cimg object
-# maxk maximun amount of permited classes
+# k number of classes
 
 # Value:
-# thresholdATC returns a list with class "list" containing the following components:
-# classes
-#    optimal classification number
-# thresholds
-#    class bounds
-
+# thresholdATC returns a list with class "integer" 
 
 ############################################################################################
 
-thresholdATC <- function(img, maxk){
+thresholdATC <- function(img, k){
   
   # Find the vector of probabilities of the gray leves 0,1,...,L-1
   
@@ -37,11 +32,11 @@ thresholdATC <- function(img, maxk){
   
   # Repeat the process for 2,..., maxk classes
   
-  for (i in 1:(maxk-1)){
+  for (i in 1:(k-1)){
     
     # Find the new threshold using maximum total correlation criterion
     
-    thr <- c(thr, newClust[argmaxTC(prob[newClust])+1])
+    thr <- c(thr, newClust[argmaxTC(prob[newClust+1]/sum(prob[newClust+1]))])
     
     # Order the thresholds
     
@@ -49,11 +44,11 @@ thresholdATC <- function(img, maxk){
     
     # Find the classes according to the thresholds
     
-    clust <- grayClustering(L, thr)
+    clust <- grayClustering(L, thr+1)
     
     # Find the cost function for i+1 classes
     
-    cost[i] <- costATC(1, prob, thr)
+    cost[i] <- costATC(0.8, prob, thr)
     
     # Find the variance per class
     
@@ -72,17 +67,7 @@ thresholdATC <- function(img, maxk){
     newClust <- clust[argmaxVar,][clust[argmaxVar,]!=-1]
   }
   
-  # Find the argmin of cost and sum 1 to obtain the optimal number of classes 
-  
-  kOptimal <- which(cost == min(cost))+1
-  
-  # Joint the thresholds for KOptimal classes
-  
-  solutionATC <- list("classes"=kOptimal, "thresholds"=thr)
-  
   # Output
   
-  return(solutionATC)
+  return(thr)
 }
-    
-

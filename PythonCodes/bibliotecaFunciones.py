@@ -3,61 +3,36 @@ import numpy as np
 from typing import List, Dict
 
 def thresholded_image(img: np.ndarray, thr: List[int]) -> np.ndarray:
-    """
-    thresholdedImage function
-
+    """thresholdedImage function
     Arguments:
     img a numpy.ndarray object representing an image
     thr a list of thresholds
-
     Value:
-    thresholdingImage returns an object with class "numpy.ndarray" and possible values 0,1,...,255
+    thresholdingImage returns an object with class "numpy.ndarray" and possible values 0,1,...,255"""
 
-    """
     image = np.copy(img)
-
-    #Convert threshold to numpy array
-
-    if(isinstance(thr, int)):
+    if isinstance(thr, int):
         thr = np.array([thr], dtype=int)
-
     thr = np.array(thr, dtype=int)
-
     _, counts = np.unique(thr, return_counts=True) 
     for count in counts:
-        if(count == 1):
-            continue
-        print("[Error!]: there are repetead values in 'thr' (list of thresholds) argument") #Error check
-        exit()
-    
-    # Find and sort gray levels
-    
+        if count > 1:
+            raise Exception("[Error!]: there are repetead values in 'thr' (list of thresholds) argument")
     _, grays = exposure.histogram(img)
-    
-    # Find amount of gray levels and thresholds
-
     L = grays.size
-    
     K = thr.size
-    
-    if(K == 0):
-        print("[Error!]: 'thr', list of thresholds, is empty") #Error check
-        exit()
-    if(K>L):
-        print("[Error!]: 'thr', list of thresholds, contains more values than the amount of gray levels") #Error check
-        exit()
+    if K == 0:
+        raise Exception("[Error!]: 'thr', list of thresholds, is empty")
+    if K > L:
+        raise Exception("[Error!]: 'thr', list of thresholds, contains more values than the amount of gray levels")
 
     # Compute the grayscale mean in each class
-
     avg = np.zeros(1)
     avg[0] = np.mean(grays[0:(thr[0]+1)])
     if(K != 1):
         for i in range(1, K):
             avg = np.append(avg, np.mean(grays[(thr[i-1]+1):(thr[i]+1)]))
     avg = np.append(avg, np.mean(grays[(thr[K-1]+1):]))
-
-    # Round the means
-
     avg = np.round(avg)
 
     # Replace each gray value in the image by the mean of its class
@@ -68,72 +43,35 @@ def thresholded_image(img: np.ndarray, thr: List[int]) -> np.ndarray:
             image[(image>=grays[thr[i-1]+1]) & (image<=grays[thr[i]])] = avg[i]
     image[image>grays[thr[K-1]]] = avg[-1]
 
-    #Output
-
     return image
 
-
-
 def PSNR(img: np.ndarray, thImg: np.ndarray) -> np.float64:
-    """
-    Compute the peak signal to noise ratio (PSNR) measured in decibel (dB) of a thersholded 
+    """Compute the peak signal to noise ratio (PSNR) measured in decibel (dB) of a thersholded 
     image
-
     Arguments:
     img a "numpy.ndarray" object representing an image
     thImg a thresholded image of img, a "numpy.ndarray" object
-
     Value:
-    PSNR returns an object with type class 'numpy.float64'
-    """
+    PSNR returns an object with type class 'numpy.float64'"""
 
-    image = np.copy(img)
-    thresholded_image = np.copy(thImg)
+    image = np.asarray(np.copy(img), dtype=np.int32)
+    thresholded_image = np.asarray(np.copy(thImg), dtype=np.int32)
 
-    # Convert images to appropiate data type
-
-    image = np.asarray(image, dtype=np.int32)
-    thresholded_image = np.asarray(thresholded_image, dtype=np.int32)
-
-    # Checking if the images shape match
-
-    if(image.shape != thresholdedImage.shape):
-        print("[Error!]: the shape of 'img' and 'thImg' does not match")
-        exit()
+    if image.shape != thresholded_image.shape:
+        raise Exception("[Error!]: the shape of 'img' and 'thImg' does not match")
     
     # Compute the root mean-squared error (RMSE)
-
-    rmse = np.sqrt(np.mean((image - thresholdedImage) ** 2))
+    rmse = np.sqrt(np.mean((image - thresholded_image) ** 2))
 
     # Compute the peak signal to noise ratio (PSNR)
-
     psnr = 20 * np.log10(np.max(img) / rmse)
 
     return psnr
 
-def image_histogram(img):
-    """
-    Build the histogram of the gray levels of a given image 
-
-    Arguments:
-    img a "numpy.ndarray" object
-
-    Value:
-    imageHistogram returns a list with class "data.frame" containing the following components:
-    grays
-    gray level
-    freq
-    frequency of the gray level
-    """
-    pass
-
 def image_probabilities(img: np.ndarray) -> Dict[int, float]:
     probabilities = dict()
-
-    # Get the histogram for the given image.
     histogram = image_histogram(img)
 
-    # Calculate the probability of each gray level.
     for data_frame in histogram:
         probabilities[data_frame.grays] = data_frame.freq / img.size
     
@@ -152,3 +90,70 @@ def gray_clustering(levels: int, breakPositions: List[int], levelsOffset: int = 
             clusters[-1].append(x)
     
     return clusters
+
+def image_histogram(img: np.ndarray) -> Dict[int, int]:
+    """Build the histogram of the gray levels of a given image 
+    Arguments:
+    img a "numpy.ndarray" object 
+    Value:
+    image_histogram returns a dictionary with gray levels frequencies"""
+    
+    image = np.copy(img)
+
+    # Find and sort gray levels and frequency
+    grays, freq = np.unique(image.flatten(), return_counts=True)
+    histogram = dict(list(zip(grays, freq)))
+
+    return histogram
+
+    
+def cluster_mean(prob: List[float], clust: List[int], start: int) -> float:
+    """Compute the mean of a given cluster 
+    Arguments:
+    prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+    clust a cluster of the gray levels (list of elements of class int)
+    start 0 or 1 (int) for gray levels 0,...,L-1 or 1,...,L, respectively 
+    Value:
+    cluster_mean returns an object with class float"""
+    
+    term = list()
+    clusterProb = 0
+
+    # Compute the expected value of each element in the cluster
+    # and compute the cluster probability
+    for grayLevel in clust:
+        term.append(grayLevel * prob[grayLevel - start]) 
+        clusterProb += prob[grayLevel - start]
+
+    # Compute the cluster mean
+    clusterMean = sum(term) / clusterProb
+
+    return clusterMean
+
+
+def cluster_var(prob: List[float], clust: List[int], start: int) -> float:
+    """Compute the variance of a given cluster 
+    Arguments:
+    prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+    clust a cluster of the gray levels (list of elements of class int)
+    start 0 or 1 (int) for gray levels 0,...,L-1 or 1,...,L, respectively 
+    Value:
+    cluster_mean returns an object with class float"""
+    
+    term = list()
+    clusterProb = 0
+    
+    clusterMean = cluster_mean(prob, clust, start)
+
+    # Compute the variance of each element in the cluster
+    # and compute the cluster probability
+    for grayLevel in clust:
+        term.append(((grayLevel - clusterMean) ** 2)* prob[grayLevel - start]) 
+        clusterProb += prob[grayLevel - start]
+
+    clusterVariance = sum(term) / clusterProb
+
+    return clusterVariance
+
+
+#def prob_up_to_level(prob: List[float], )
