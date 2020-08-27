@@ -216,36 +216,85 @@ levels a list of gray levels which give the breaks
 Value:
 prob_up_to_level returns an object with class 'list', a float elements list
 """
-    #Check single break value
+    # Check single break value
 
     if(isinstance(levels, int)):
         levels = list(levels)
 
     # Find the amount of levels
 
-    n = len(levels)
+    amountOfLevels = len(levels)
 
-    if(n == 0):
+    if(amountOfLevels == 0):
         print("[Error!]: 'levels', list of breaks, is empty") #Error check
         exit()
-    if(n > len(prob)):
+    if(amountOfLevels > len(prob)):
         print("[Error!]: 'levels', list of breaks, contains more values than the amount of levels in probability list") #Error check
         exit()
-    # Initialize
+    
+    # Initialize probUpToLevel list
     
     probUpToLevel = list()
 
     probUpToLevel.append(sum(prob[0 : levels[0] + 1])) 
 
-    if (n == 1):
+    if (amountOfLevels == 1):
     #Find both probabilities
         probUpToLevel.append(1 - probUpToLevel[0])
     else:
     #Find probabilities up to each level
-        for i in range(1, n):
+        for i in range(1, amountOfLevels):
             probUpToLevel.append( sum( prob[(levels[i - 1] + 1) : (levels[i] + 1)] ) )
         
         probUpToLevel.append(1 - sum(probUpToLevel))
 
     return probUpToLevel
 
+
+def total_correlation(prob: List[float], levels: List[int]) -> float:
+    """
+Compute the total correlation according to a list of breaking gray levels 
+
+Arguments:
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+levels a list of gray levels which give the breaks 
+
+Value:
+total_correlation returns an object with class 'float'
+"""
+
+    # Check single break value
+
+    if(isinstance(levels, int)):
+        levels = list(levels)
+
+    # Find the probabilities according to the given levels
+
+    probUpToLevel = prob_up_to_level(prob, levels)
+
+    # Find the number of breaks and probabilities
+  
+    amountOfLevels = len(levels)
+    amountOfProbabilities = len(prob)
+
+    # Initialize correlations list
+
+    correlations = list()
+
+    correlations.append( -np.log( sum( np.square( prob[0 : (levels[0] + 1)] ) ) / probUpToLevel[0] ** 2) )
+
+    if (amountOfLevels == 1):
+        # Find the correlation of both intervals
+        correlations.append( -np.log( sum( np.square( prob[(levels[0] + 1) : amountOfProbabilities + 1] ) ) / probUpToLevel[1] ** 2) )
+    else:
+        # Find the correlation of each interval
+        for i in range(1, amountOfLevels):
+            correlations.append( -np.log( sum( np.square( prob[(levels[i - 1] + 1) : (levels[i] + 1)] ) ) / probUpToLevel[i] ** 2) )
+
+        correlations.append( -np.log( sum( np.square( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities] ) ) / probUpToLevel[amountOfLevels] ** 2) )
+
+    # Find the total correlation
+
+    totalCorrelation = sum(correlations)
+
+    return totalCorrelation
