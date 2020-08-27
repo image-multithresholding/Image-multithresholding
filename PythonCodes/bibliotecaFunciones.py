@@ -1,6 +1,7 @@
 from skimage import exposure
 import numpy as np
 from typing import List, Dict
+from more_itertools import locate
 
 def thresholdedImage(img, thr):
     
@@ -349,3 +350,39 @@ total_correlation returns an object with class 'float'
     totalEntropy = sum(entropies)
 
     return totalEntropy
+
+
+def argmax_TC(prob: List[float]) -> List[int]:
+    """
+Compute the levels at which the maximum total correlation is reached 
+
+Arguments:
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1) 
+
+Value:
+argmax_TC returns an object with class 'list', list of float elements
+"""
+
+    # Find the amount of gray levels equal to the amount of probabilities
+
+    amountOfProbabilities = len(prob)
+
+    # Initialize totalCorrelations list
+
+    totalCorrelations = list()
+
+    # Find the total correlation varying the break level 
+    # (notice that it makes no sense to consider the interval extrems since no partition holds)
+
+    for i in range(0, amountOfProbabilities - 2):
+        totalCorrelations.append(total_correlation(prob, i))
+
+    # Find the maximum total correlation
+
+    maxTotalCorrelation = max(totalCorrelations)
+
+    # Find the level at which the maximum total entropy is reached
+
+    argmax = locate(totalCorrelations, lambda x: x == maxTotalCorrelation)
+
+    return argmax
