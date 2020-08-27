@@ -298,3 +298,54 @@ total_correlation returns an object with class 'float'
     totalCorrelation = sum(correlations)
 
     return totalCorrelation
+
+
+def total_entropy(prob: List[float], levels: List[int]) -> float:
+    """
+Compute the total entropy according to a list of breaking gray levels 
+
+Arguments:
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+levels a list of gray levels which give the breaks 
+
+Value:
+total_correlation returns an object with class 'float'
+"""
+
+    # Check single break value
+
+    if(isinstance(levels, int)):
+        levels = list(levels)
+
+    # Find the probabilities according to the given levels
+
+    probUpToLevel = prob_up_to_level(prob, levels)
+
+    # Find the number of breaks and probabilities
+  
+    amountOfLevels = len(levels)
+    amountOfProbabilities = len(prob)
+
+    prob = np.array(prob)
+
+    # Initialize entropies list
+
+    entropies = list()
+
+    entropies.append( -np.sum( np.multiply( prob[0 : levels[0]], np.log( prob[0 : levels[0]] / probUpToLevel[1] ) ) ) / probUpToLevel[1] )
+
+    if (amountOfLevels == 1):
+        # Find the entropy of both intervals
+        entropies.append( -np.sum( np.multiply( prob[(levels[0] + 1) : amountOfProbabilities], np.log( prob[(levels[0] + 1) : amountOfProbabilities] / probUpToLevel[2] ) ) ) / probUpToLevel[2] )
+    else:
+        # Find the entropy of each interval
+        for i in range(1, amountOfLevels):
+            entropies.append( -np.sum( np.multiply( prob[(levels[i - 1] + 1) : (levels[i] + 1)], np.log( prob[(levels[i - 1] + 1) : (levels[i] + 1)] / probUpToLevel[i] ) ) ) / probUpToLevel[i] )
+
+        entropies.append( -np.sum( np.multiply( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities], np.log( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities] / probUpToLevel[amountOfLevels] ) ) ) / probUpToLevel[amountOfLevels] )
+
+    # Find the total entropy
+
+    totalEntropy = sum(entropies)
+
+    return totalEntropy
