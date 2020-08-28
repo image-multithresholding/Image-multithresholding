@@ -28,9 +28,8 @@ thresholdATC <- function(img, k){
   
   newClust <- 0:(L-1)
   thr <- vector()
-  cost <- vector()
   
-  # Repeat the process for 2,..., maxk classes
+  # Repeat the process for 2,..., k classes
   
   for (i in 1:(k-1)){
     
@@ -46,10 +45,6 @@ thresholdATC <- function(img, k){
     
     clust <- grayClustering(L, thr+1)
     
-    # Find the cost function for i+1 classes
-    
-    cost[i] <- costATC(0.8, prob, thr)
-    
     # Find the variance per class
     
     varClust <- vector()
@@ -58,7 +53,7 @@ thresholdATC <- function(img, k){
       # notice we must remove those fictitious elements; i.e. -1
     }
     
-    # Find the argmax of cluster varaiances
+    # Find the argmax of cluster variances
     
     argmaxVar <- which(varClust == max(varClust))
     
