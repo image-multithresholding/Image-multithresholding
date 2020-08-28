@@ -264,10 +264,6 @@ Value:
 total_correlation returns an object with class 'float'
 """
 
-    # Check single break value
-
-    if(isinstance(levels, int)):
-        levels = list(levels)
 
     # Find the probabilities according to the given levels
 
@@ -333,11 +329,12 @@ total_correlation returns an object with class 'float'
 
     entropies = list()
 
-    entropies.append( -np.sum( np.multiply( prob[0 : levels[0]], np.log( prob[0 : levels[0]] / probUpToLevel[1] ) ) ) / probUpToLevel[1] )
+    entropies.append( -np.sum( np.multiply( prob[0 : levels[0] + 1], np.log( prob[0 : levels[0] + 1] / probUpToLevel[0] ) ) ) / probUpToLevel[0] )
 
     if (amountOfLevels == 1):
         # Find the entropy of both intervals
-        entropies.append( -np.sum( np.multiply( prob[(levels[0] + 1) : amountOfProbabilities], np.log( prob[(levels[0] + 1) : amountOfProbabilities] / probUpToLevel[2] ) ) ) / probUpToLevel[2] )
+        entropies.append( -np.sum( np.multiply( prob[(levels[0] + 1) : amountOfProbabilities], np.log( prob[(levels[0] + 1) : amountOfProbabilities] / probUpToLevel[1] ) ) ) / probUpToLevel[1] )
+        print(entropies)
     else:
         # Find the entropy of each interval
         for i in range(1, amountOfLevels):
@@ -375,7 +372,7 @@ argmax_TC returns an object with class 'list', list of float elements
     # (notice that it makes no sense to consider the interval extrems since no partition holds)
 
     for i in range(0, amountOfProbabilities - 2):
-        totalCorrelations.append(total_correlation(prob, i))
+        totalCorrelations.append(total_correlation(prob, [i]))
 
     # Find the maximum total correlation
 
@@ -383,6 +380,6 @@ argmax_TC returns an object with class 'list', list of float elements
 
     # Find the level at which the maximum total entropy is reached
 
-    argmax = locate(totalCorrelations, lambda x: x == maxTotalCorrelation)
+    argmax = totalCorrelations.index(maxTotalCorrelation)
 
     return argmax
