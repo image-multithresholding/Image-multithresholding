@@ -1,6 +1,7 @@
 from skimage import exposure
 import numpy as np
 from typing import List, Dict
+from more_itertools import locate
 
 def thresholdedImage(img, thr):
     
@@ -205,4 +206,180 @@ cluster_mean returns an object with class float
     return clusterVariance
 
 
-def prob_up_to_level(prob: List[float], )
+def prob_up_to_level(prob: List[float], levels: List[int]) -> float:
+    """
+Compute a vector of probabilities up to a list of gray levels 
+
+Arguments:
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+levels a list of gray levels which give the breaks 
+
+Value:
+prob_up_to_level returns an object with class 'list', a float elements list
+"""
+    # Check single break value
+
+    if(isinstance(levels, int)):
+        levels = list(levels)
+
+    # Find the amount of levels
+
+    amountOfLevels = len(levels)
+
+    if(amountOfLevels == 0):
+        print("[Error!]: 'levels', list of breaks, is empty") #Error check
+        exit()
+    if(amountOfLevels > len(prob)):
+        print("[Error!]: 'levels', list of breaks, contains more values than the amount of levels in probability list") #Error check
+        exit()
+    
+    # Initialize probUpToLevel list
+    
+    probUpToLevel = list()
+
+    probUpToLevel.append(sum(prob[0 : levels[0] + 1])) 
+
+    if (amountOfLevels == 1):
+    #Find both probabilities
+        probUpToLevel.append(1 - probUpToLevel[0])
+    else:
+    #Find probabilities up to each level
+        for i in range(1, amountOfLevels):
+            probUpToLevel.append( sum( prob[(levels[i - 1] + 1) : (levels[i] + 1)] ) )
+        
+        probUpToLevel.append(1 - sum(probUpToLevel))
+
+    return probUpToLevel
+
+
+def total_correlation(prob: List[float], levels: List[int]) -> float:
+    """
+Compute the total correlation according to a list of breaking gray levels 
+
+Arguments:
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+levels a list of gray levels which give the breaks 
+
+Value:
+total_correlation returns an object with class 'float'
+"""
+
+
+    # Find the probabilities according to the given levels
+
+    probUpToLevel = prob_up_to_level(prob, levels)
+
+    # Find the number of breaks and probabilities
+  
+    amountOfLevels = len(levels)
+    amountOfProbabilities = len(prob)
+
+    # Initialize correlations list
+
+    correlations = list()
+
+    correlations.append( -np.log( sum( np.square( prob[0 : (levels[0] + 1)] ) ) / probUpToLevel[0] ** 2) )
+
+    if (amountOfLevels == 1):
+        # Find the correlation of both intervals
+        correlations.append( -np.log( sum( np.square( prob[(levels[0] + 1) : amountOfProbabilities + 1] ) ) / probUpToLevel[1] ** 2) )
+    else:
+        # Find the correlation of each interval
+        for i in range(1, amountOfLevels):
+            correlations.append( -np.log( sum( np.square( prob[(levels[i - 1] + 1) : (levels[i] + 1)] ) ) / probUpToLevel[i] ** 2) )
+
+        correlations.append( -np.log( sum( np.square( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities] ) ) / probUpToLevel[amountOfLevels] ** 2) )
+
+    # Find the total correlation
+
+    totalCorrelation = sum(correlations)
+
+    return totalCorrelation
+
+
+def total_entropy(prob: List[float], levels: List[int]) -> float:
+    """
+Compute the total entropy according to a list of breaking gray levels 
+
+Arguments:
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+levels a list of gray levels which give the breaks 
+
+Value:
+total_correlation returns an object with class 'float'
+"""
+
+    # Check single break value
+
+    if(isinstance(levels, int)):
+        levels = list(levels)
+
+    # Find the probabilities according to the given levels
+
+    probUpToLevel = prob_up_to_level(prob, levels)
+
+    # Find the number of breaks and probabilities
+  
+    amountOfLevels = len(levels)
+    amountOfProbabilities = len(prob)
+
+    prob = np.array(prob)
+
+    # Initialize entropies list
+
+    entropies = list()
+
+    entropies.append( -np.sum( np.multiply( prob[0 : levels[0] + 1], np.log( prob[0 : levels[0] + 1] / probUpToLevel[0] ) ) ) / probUpToLevel[0] )
+
+    if (amountOfLevels == 1):
+        # Find the entropy of both intervals
+        entropies.append( -np.sum( np.multiply( prob[(levels[0] + 1) : amountOfProbabilities], np.log( prob[(levels[0] + 1) : amountOfProbabilities] / probUpToLevel[1] ) ) ) / probUpToLevel[1] )
+        print(entropies)
+    else:
+        # Find the entropy of each interval
+        for i in range(1, amountOfLevels):
+            entropies.append( -np.sum( np.multiply( prob[(levels[i - 1] + 1) : (levels[i] + 1)], np.log( prob[(levels[i - 1] + 1) : (levels[i] + 1)] / probUpToLevel[i] ) ) ) / probUpToLevel[i] )
+
+        entropies.append( -np.sum( np.multiply( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities], np.log( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities] / probUpToLevel[amountOfLevels] ) ) ) / probUpToLevel[amountOfLevels] )
+
+    # Find the total entropy
+
+    totalEntropy = sum(entropies)
+
+    return totalEntropy
+
+
+def argmax_TC(prob: List[float]) -> List[int]:
+    """
+Compute the levels at which the maximum total correlation is reached 
+
+Arguments:
+prob the probability list of gray levels (list of elements of class float, value from 0 to 1) 
+
+Value:
+argmax_TC returns an object with class 'list', list of float elements
+"""
+
+    # Find the amount of gray levels equal to the amount of probabilities
+
+    amountOfProbabilities = len(prob)
+
+    # Initialize totalCorrelations list
+
+    totalCorrelations = list()
+
+    # Find the total correlation varying the break level 
+    # (notice that it makes no sense to consider the interval extrems since no partition holds)
+
+    for i in range(0, amountOfProbabilities - 2):
+        totalCorrelations.append(total_correlation(prob, [i]))
+
+    # Find the maximum total correlation
+
+    maxTotalCorrelation = max(totalCorrelations)
+
+    # Find the level at which the maximum total entropy is reached
+
+    argmax = totalCorrelations.index(maxTotalCorrelation)
+
+    return argmax
