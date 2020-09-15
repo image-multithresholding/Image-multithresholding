@@ -1,6 +1,6 @@
 import unittest
 import PythonCodes.library.thresholding_base as tbase
-import PythonCodes.library.thresholdsing_candidates as tcand
+import PythonCodes.library.thresholding_candidates as tcand
 import numpy as np
 from skimage import io
 

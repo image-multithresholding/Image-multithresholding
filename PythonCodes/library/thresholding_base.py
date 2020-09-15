@@ -1,7 +1,10 @@
-from skimage import exposure
+from skimage import exposure, io
 import numpy as np
 import itertools
 from typing import List, Dict, Tuple, Callable
+
+def load_image(path: str) -> np.ndarray:
+    return io.imread(path)
 
 def thresholded_image(img: np.ndarray, thr: List[int]) -> np.ndarray:
     """thresholdedImage function
@@ -67,8 +70,8 @@ def PSNR(img: np.ndarray, thImg: np.ndarray) -> np.float64:
 
     return psnr
 
-def image_probabilities(img: np.ndarray) -> Dict[int, float]:
-    probabilities = dict()
+def image_probabilities(img: np.ndarray) -> List[float]:
+    probabilities = [.0 for _ in range(256)]
     histogram = image_histogram(img)
 
     for gray in histogram:
@@ -104,3 +107,45 @@ def image_histogram(img: np.ndarray) -> Dict[int, int]:
     histogram = dict(list(zip(grays, freq)))
 
     return histogram
+
+def prob_up_to_level(prob: List[float], levels: List[int]) -> float:
+    """
+    Compute a vector of probabilities up to a list of gray levels 
+
+    Arguments:
+    prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+    levels a list of gray levels which give the breaks 
+
+    Value:
+    prob_up_to_level returns an object with class 'list', a float elements list
+    """
+
+    # Find the amount of levels
+
+    amountOfLevels = len(levels)
+
+    if(amountOfLevels == 0):
+        raise Exception("list of breaks is empty")
+    if(amountOfLevels > len(prob)):
+        raise Exception("more levels than len of prob")
+    for level in levels:
+        if type(level) != int:
+            raise Exception(f"non-integer level: {level}")
+    
+    # Initialize probUpToLevel list
+    
+    probUpToLevel = list()
+
+    probUpToLevel.append(sum(prob[:levels[0] + 1]))
+
+    if (amountOfLevels == 1):
+    #Find both probabilities
+        probUpToLevel.append(1 - probUpToLevel[0])
+    else:
+    #Find probabilities up to each level
+        for i in range(1, amountOfLevels):
+            probUpToLevel.append( sum( prob[(levels[i - 1] + 1) : (levels[i] + 1)] ) )
+        
+        probUpToLevel.append(1 - sum(probUpToLevel))
+
+    return probUpToLevel

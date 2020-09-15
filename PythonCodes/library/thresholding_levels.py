@@ -27,7 +27,6 @@ def cluster_mean(prob: List[float], clust: List[int], start: int) -> float:
 
     return clusterMean
 
-
 def cluster_var(prob: List[float], clust: List[int], start: int) -> float:
     """Compute the variance of a given cluster 
     Arguments:
