@@ -2,6 +2,7 @@ from skimage import exposure
 import numpy as np
 from typing import List, Dict
 from more_itertools import locate
+from math import cos, pi, ceil
 
 def thresholdedImage(img, thr):
     
@@ -383,3 +384,203 @@ argmax_TC returns an object with class 'list', list of float elements
     argmax = totalCorrelations.index(maxTotalCorrelation)
 
     return argmax
+
+
+def threshold_ATC(img: np.ndarray, k: int) -> List[int]:
+    """
+Compute the optimal number of classes according to the automatic thresholding criterion 
+proposed by Yen et al. (1995) 
+
+Arguments:
+img a numpy.ndarray object
+k number of classes 
+
+Value:
+threshold_ATC returns an object with class 'list', list of integer elements
+"""
+
+    if k < 2:
+        raise Exception("The number of classes must be greater than or equal to 2")
+
+    image = np.copy(img)
+
+    # Find the vector of probabilities of the gray leves 0,1,...,L-1
+
+    prob = np.array(list(image_probabilities(image).values()))
+
+    amountOfProbabilities = len(prob)
+
+    newClust = list(i for i in range(0, amountOfProbabilities))
+    thr = list([])
+    varClust = list()
+
+    for i in range(0, k-1):
+
+        # Find the new threshold using maximum total correlation criterion
+        
+        thr.append(newClust[argmax_TC(prob[newClust[0] : newClust[-1] + 1] / sum(prob[newClust[0] : newClust[-1] + 1]))])
+
+        thr.sort()
+
+        # Find the classes according to the thresholds
+
+        clust = gray_clustering(amountOfProbabilities, thr)
+
+        # Find the variance per class
+
+        for j in range(0, i+1):
+
+            varClust.append(cluster_var(prob, clust[j], 0))
+
+        # Find the argmax of cluster variances
+
+        argMaxVar = varClust.index(max(varClust))
+
+        # Define the new lass to be partitioned
+
+        newClust = clust[argMaxVar]
+
+    return thr
+
+def smoothed_histogram(hist: Dict[int, int], p: int) -> Dict[int, int]:
+    """
+Smooth a histogram of gray levels using a Gaussian kernel 
+
+Arguments:
+hist frequencies in the histogram of gray levels 0,1,...,L-1 (dictionary)
+p giving the 2p+1 bins (windows size) 
+
+Value:
+smoothed_histogram returns an object with class 'dict', dictionary of integer values
+"""
+
+    L = len(hist)
+
+    # Find the windows size
+
+    size = 2*p + 1
+
+    bin = list()
+
+    # Define the Gaussian mask windows
+
+    for i in range(0, size): 
+        bin.append(0.5 * (1 - cos(i * pi / p)))
+
+    smoothHist = dict()
+
+    # Find special bounds
+
+    leftBound = p+1
+    rightBound = L-p
+
+    # Find the convolution between the histogram and the Gaussian mask windows in the middle places
+
+    for i in range(leftBound, rightBound):
+        
+        term = list()
+        termPosition = 1
+
+
+
+def valleys(hist: Dict[int, int]) -> List[int]:
+    """
+Find the valleys of a histogram of gray levels 
+
+Arguments:
+hist frequencies in the histogram of gray levels 0,1,...,L-1 (dictionary) 
+
+Value:
+valleys returns an object with class 'list', list of integer values
+"""
+
+    L = len(hist)
+
+    toRight = list([False]*L)
+    toLeft = list([False]*L)
+
+    # Find when a frequency is less than or equal to the following one
+
+    for i in range(0, L-1):
+        toRight[i] = hist[i] <= hist[i+1]
+
+    # Find when a frequency is less than the previous one
+
+    for i in range(1, L):
+        toLeft[i] = hist[i] < hist[i-1]
+    
+    # Find when both condition hold
+
+    both = list(i and j for i,j in zip(toRight, toLeft))
+
+    val = list(i for i, x in enumerate(both) if x == True)
+
+    return val
+
+
+def valley_clustering(L: int, val: List[int]) -> np.ndarray:
+    """
+Find limits of the clusters of a histogram of gray levels according to given valleys 
+
+Arguments:
+L number of gray levels 1,...,L 
+val list of valleys
+
+Value:
+valley_clustering returns an object with class 'np.ndarray'
+"""
+
+    # Find the amount of clusters
+
+    n = len(val) + 1
+
+    clust = np.zeros((n, 2), dtype=np.uint8)
+
+    # Find clusters
+
+    clust[0] = [0, val[0] - 1]
+
+    for i in range(1, n-1):
+        clust[i] = [val[i-1], val[i] - 1]
+    
+    clust[n-1] = [val[n-2], L-1]
+
+    return clust
+
+
+def searching_window(clust: List[int]) -> np.ndarray:
+    """
+Find searching windows of a cluster as defined in Chang et al. (2002), giving first and
+last element of each cluster
+
+Arguments:
+clust a list containing the first and last element in a cluster
+
+Value:
+searching_window returns an object with class 'np.ndarray'
+"""
+
+    # Find length of the initial cluster
+
+    n = clust[1] - clust[0] + 1
+
+    if n == 2:
+        w = np.transpose(np.array(clust))
+    
+    else:
+        # Find length of the searching windows
+
+        length = int(ceil(n / 2))
+
+        total = n - length + 1
+
+        w = np.zeros((total, 2), dtype=np.uint8)
+
+        # Find searching windows
+
+        for j in range(0, total):
+            w[j] = [clust[0] + j - 1, ceil(clust[0] + j + length - 2)]
+    
+    return w
+
+
