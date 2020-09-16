@@ -393,94 +393,60 @@ proposed by Yen et al. (1995)
 
 Arguments:
 img a numpy.ndarray object
-k number of classes 
+k number of thresholds 
 
 Value:
 threshold_ATC returns an object with class 'list', list of integer elements
 """
 
-    if k < 2:
-        raise Exception("The number of classes must be greater than or equal to 2")
+    if k < 1:
+        raise Exception("The number of thresholds must be greater than or equal to 1")
 
     image = np.copy(img)
 
     # Find the vector of probabilities of the gray leves 0,1,...,L-1
 
-    prob = np.array(list(image_probabilities(image).values()))
+    prob = np.array(image_probabilities(image))
 
     amountOfProbabilities = len(prob)
 
+    print("Probabilities", amountOfProbabilities)
     newClust = list(i for i in range(0, amountOfProbabilities))
     thr = list([])
-    varClust = list()
 
-    for i in range(0, k-1):
+    for i in range(0, k):
 
+        print("Newclust:", newClust)
         # Find the new threshold using maximum total correlation criterion
         
         thr.append(newClust[argmax_TC(prob[newClust[0] : newClust[-1] + 1] / sum(prob[newClust[0] : newClust[-1] + 1]))])
 
         thr.sort()
 
+        print("thr:", thr)
         # Find the classes according to the thresholds
 
         clust = gray_clustering(amountOfProbabilities, thr)
 
+        print(clust)
         # Find the variance per class
 
-        for j in range(0, i+1):
+        varClust = list()
+        
+        for j in range(0, i+2):
 
             varClust.append(cluster_var(prob, clust[j], 0))
 
         # Find the argmax of cluster variances
-
+        print(varClust)
         argMaxVar = varClust.index(max(varClust))
 
+        print("argmax: ", argMaxVar)
         # Define the new lass to be partitioned
 
         newClust = clust[argMaxVar]
 
     return thr
-
-def smoothed_histogram(hist: Dict[int, int], p: int) -> Dict[int, int]:
-    """
-Smooth a histogram of gray levels using a Gaussian kernel 
-
-Arguments:
-hist frequencies in the histogram of gray levels 0,1,...,L-1 (dictionary)
-p giving the 2p+1 bins (windows size) 
-
-Value:
-smoothed_histogram returns an object with class 'dict', dictionary of integer values
-"""
-
-    L = len(hist)
-
-    # Find the windows size
-
-    size = 2*p + 1
-
-    bin = list()
-
-    # Define the Gaussian mask windows
-
-    for i in range(0, size): 
-        bin.append(0.5 * (1 - cos(i * pi / p)))
-
-    smoothHist = dict()
-
-    # Find special bounds
-
-    leftBound = p+1
-    rightBound = L-p
-
-    # Find the convolution between the histogram and the Gaussian mask windows in the middle places
-
-    for i in range(leftBound, rightBound):
-        
-        term = list()
-        termPosition = 1
-
 
 
 def valleys(hist: Dict[int, int]) -> List[int]:
@@ -570,17 +536,15 @@ searching_window returns an object with class 'np.ndarray'
     else:
         # Find length of the searching windows
 
-        length = int(ceil(n / 2))
+        length = ceil(n / 2)
 
         total = n - length + 1
 
-        w = np.zeros((total, 2), dtype=np.uint8)
+        w = np.zeros((int(total), 2), dtype=np.uint8)
 
         # Find searching windows
 
         for j in range(0, total):
-            w[j] = [clust[0] + j - 1, ceil(clust[0] + j + length - 2)]
+            w[j] = [clust[0] + j , ceil(clust[0] + j + length - 1)]
     
     return w
-
-
