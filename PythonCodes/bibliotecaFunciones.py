@@ -1,7 +1,6 @@
 from skimage import exposure
 import numpy as np
 from typing import List, Dict
-from more_itertools import locate
 from math import cos, pi, ceil
 
 def thresholdedImage(img, thr):
