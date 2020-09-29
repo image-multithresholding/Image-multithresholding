@@ -1,7 +1,7 @@
 from skimage import exposure
 import numpy as np
-from typing import List, Dict
-from math import cos, pi, ceil
+from typing import List, Dict, Tuple
+from math import cos, pi, ceil, sqrt, exp
 
 def thresholdedImage(img, thr):
     
@@ -385,6 +385,30 @@ argmax_TC returns an object with class 'list', list of float elements
     return argmax
 
 
+def image_probabilities(img: np.ndarray) -> List[float]:
+    probabilities = [.0 for _ in range(256)]
+    histogram = image_histogram(img)
+
+    for gray in histogram:
+        probabilities[gray] = histogram[gray] / img.size
+    
+    return probabilities
+
+def gray_clustering(levels: int, breakPositions: List[int], levelsOffset: int = 0) -> List[List[int]]:
+    clusters = [[]]
+
+    # Iterate over every level.
+    for x in range(levelsOffset, levelsOffset + levels):
+        # If we have to break at this level, start a new list.
+        if x in breakPositions:
+            clusters.append([x])
+        # If not, just add this level to the last created cluster.
+        else:
+            clusters[-1].append(x)
+    
+    return clusters
+
+
 def threshold_ATC(img: np.ndarray, k: int) -> List[int]:
     """
 Compute the optimal number of classes according to the automatic thresholding criterion 
@@ -547,3 +571,182 @@ searching_window returns an object with class 'np.ndarray'
             w[j] = [clust[0] + j , ceil(clust[0] + j + length - 1)]
     
     return w
+
+
+def cluster_nth_moment(n: int, prob: List[float], clust: List[int]) -> float:
+    """
+Compute the nth moment of a given cluster of gray levels.
+
+Arguments:
+n order moment
+prob the probability vector of gray levels 0,...,L-1
+clust a cluster of the gray levels
+
+Value:
+cluster_nth_moment returns an object with class float
+"""
+
+    clustMean = cluster_mean(prob, clust, 0)
+
+    length = len(clust)
+
+    numerator = list()
+    denominator = list()
+
+    # Find nth moment factors
+
+    for i in range(0, length):
+        numerator.append( (clust[i] - clustMean) ** n * prob[ clust[i] ] ) 
+        denominator.append( prob[ clust[i] ] )
+    
+    clustMom = sum(numerator) / sum(denominator)
+
+    return clustMom
+
+def skewness(prob: List[float], clust: List[int]) -> float:
+    """
+Compute the skewness of a given cluster of gray levels.
+
+Arguments:
+prob the probability vector of gray levels 0,...,L-1
+clust a cluster of the gray levels
+
+Value:
+skewness returns an object with class float
+"""
+
+    mom2 = cluster_nth_moment(2, prob, clust)
+    mom3 = cluster_nth_moment(3, prob, clust)
+
+    skewness = mom3 / sqrt( mom2 ** 3 )
+
+    return skewness
+
+
+def optimal_window(prob: List[float], w: np.ndarray) -> List[int]:
+    """
+Find the optimal window of a cluster as defined in Chang et al. (2002).
+
+Arguments:
+prob the probability vector of gray levels 0,...,L-1
+w bounds of all searching windows of a cluster
+
+Value:
+optimal_window returns an object with class list (list of integers)
+"""
+
+    # Find the amount of searching windows
+
+    n = np.size(w, 0)
+
+    for i in range(0, n):
+
+        # Do nothing if w is of the type a,a+1
+        if w[i][1] - w[i][0] == 1: bounds = w[i].tolist()
+        
+        else:
+            skew = list()
+
+            for i in range(0, n):
+                skew.append( skewness(prob, list( range( w[i][0], w[i][1] + 1) ) ) )
+            
+            skew = [abs(x) for x in skew]
+
+            argminSkew = skew.index(min(skew))
+
+            optimalWindow = w[argminSkew]
+
+            bounds = [optimalWindow[0], optimalWindow[1]]
+    
+    return bounds
+
+
+def cluster_estimations(prob: List[float], clust: List[int]) -> List[float]:
+    """
+Find estimations of mean, variance and proportion of cluster of gray levels.
+
+Arguments:
+prob the probability vector of gray levels 0,...,L-1
+clust cluster of gray levels
+
+Value:
+cluster_estimations returns an object with class tuple containing the following components:
+meanEstimation, estimation of the cluster mean 
+varianceEstimation, estimation of the cluster variance 
+proportionEstimation, estimation of the cluster proportion
+"""
+
+    meanEstimation = cluster_mean(prob, clust, 0)
+    varianceEstimation = cluster_var(prob, clust, 0)
+    proportionEstimation = sum(prob[i] for i in clust)
+
+    clustEstimations = [meanEstimation, varianceEstimation, proportionEstimation]
+
+    return clustEstimations
+
+
+def weighted_gaussian(x: float, mu: float, sigma: float, p: float) -> float:
+    """
+Apply gaussian normal function with a given weigth.
+
+Arguments:
+x real value in the domain
+mu mean parameter
+sigma standard deviation parameter
+p weight of proportion
+
+Value:
+weighted_gaussian returns an object with class float
+"""
+
+    #Compute the gaussian value
+
+    gV = p / ( sqrt(2 * pi) * sigma ) * exp( -0.5 * ( (x-mu) / sigma ) ** 2 )
+
+    return gV
+
+
+def classification_rule(L: int, est: np.ndarray) -> Dict[int, int]:
+    """
+Classify gray levels accordind to the criterior porposed by Chang et al. (2002).
+
+Arguments:
+L amount of gray levels 0,...,L-1
+est tuple containing the outputs of cluster_estimations function
+
+Value:
+classification_rule returns an object with class dict containing the following components:
+grayLevel:classification
+"""
+
+    n = np.size(est, 0)
+
+    classification = dict()
+
+    # Assign class
+
+    for i in range(0, L):
+        
+        value = list()
+
+        for j in range(0, n):
+            value.append(weighted_gaussian(i, est[j][0], est[j][1], est[j][2]))
+        
+        classification[i] = value.index(max(value))
+    
+    return classification
+
+
+def bin_value(img: np.ndarray, maxk: int) -> int:
+    """
+Compute p which gives the 2p+1 optimal number of bins for histogram smoothing.
+
+Arguments:
+L amount of gray levels 0,...,L-1
+est tuple containing the outputs of cluster_estimations function
+
+Value:
+classification_rule returns an object with class dict containing the following components:
+grayLevel:classification
+"""
+    return

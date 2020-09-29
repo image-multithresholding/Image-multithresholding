@@ -178,25 +178,21 @@ threshold_ATC returns an object with class 'list', list of integer elements
 
     amountOfProbabilities = len(prob)
 
-    print("Probabilities", amountOfProbabilities)
     newClust = list(i for i in range(0, amountOfProbabilities))
     thr = list([])
 
     for i in range(0, k):
 
-        print("Newclust:", newClust)
         # Find the new threshold using maximum total correlation criterion
         
         thr.append(newClust[argmax_TC(prob[newClust[0] : newClust[-1] + 1] / sum(prob[newClust[0] : newClust[-1] + 1]))])
 
         thr.sort()
 
-        print("thr:", thr)
         # Find the classes according to the thresholds
 
         clust = gray_clustering(amountOfProbabilities, thr)
 
-        print(clust)
         # Find the variance per class
 
         varClust = list()
@@ -206,10 +202,8 @@ threshold_ATC returns an object with class 'list', list of integer elements
             varClust.append(cluster_var(prob, clust[j], 0))
 
         # Find the argmax of cluster variances
-        print(varClust)
         argMaxVar = varClust.index(max(varClust))
 
-        print("argmax: ", argMaxVar)
         # Define the new lass to be partitioned
 
         newClust = clust[argMaxVar]
