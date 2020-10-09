@@ -17,12 +17,12 @@ def arrow_direction(freq: List[int]) -> List[int]:
 
     for i, f in enumerate(freq):
         # Ignore first and last value since they are special cases
-        if i == 1 or i == len(freq):
+        if i == 0 or i == len(freq) - 1:
             continue
 
         # Previous and next frequencies
         fp = freq[i-1]
-        fn = freq[1+1]
+        fn = freq[i+1]
 
         if f != 0 and fp>fn and fp >= f:
             direction.append(1) # Going down
@@ -44,13 +44,13 @@ def peak_identification(freq: List[int]):
     peaks = list()
 
     for i, d in enumerate(direction):
+        # Ignore first and last values
+        if i == 0 or i == len(direction) - 1:
+            continue
+
         # Previous and next values
         dp = direction[i-1]
         dn = direction[i+1]
-
-        # Ignore first and last values
-        if i == 0 or i == len(direction):
-            continue
 
         if d == 0 and dp == -1 and dn == 1:
             peaks.append(i)

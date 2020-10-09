@@ -93,7 +93,7 @@ def gray_clustering(levels: int, breakPositions: List[int], levelsOffset: int = 
     
     return clusters
 
-def image_histogram(img: np.ndarray) -> Dict[int, int]:
+def image_histogram(img: np.ndarray) -> List[int]:
     """Build the histogram of the gray levels of a given image 
     Arguments:
     img a "numpy.ndarray" object 
@@ -103,10 +103,9 @@ def image_histogram(img: np.ndarray) -> Dict[int, int]:
     image = np.copy(img)
 
     # Find and sort gray levels and frequency
-    grays, freq = np.unique(image.flatten(), return_counts=True)
-    histogram = dict(list(zip(grays, freq)))
+    _, freq = np.unique(image.flatten(), return_counts=True)
 
-    return histogram
+    return freq
 
 def prob_up_to_level(prob: List[float], levels: List[int]) -> float:
     """

@@ -4,18 +4,19 @@ from PythonCodes.library.thresholding_analysis import arrow_direction, peak_iden
 
 def cell_histogram(freq: List[float], size: int) -> List[float]:
     n = math.ceil(len(freq)/size)
-    cuts = [freq for _ in range(size)]
 
-    return [sum(cuts[index:]) for (index, _) in enumerate(cuts[:n])]
+    val = []
+    for i in range(n):
+        val.append(sum(freq[i*size:min((i+1)*size, len(freq))]))
+    return val
 
 def hill_identification(freq: List[float], k: int) -> Tuple[int, int]:
     size = 0
     peaks = []
-    while len(peaks) <= k:
+    while len(peaks) > k or size == 0:
         size += 1
         cells = cell_histogram(freq, size)
-        direction = arrow_direction(cells)
-        peaks = peak_identification(direction)
+        peaks = peak_identification(cells)
 
     return peaks, size
 
