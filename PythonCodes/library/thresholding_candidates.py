@@ -3,6 +3,7 @@ import numpy as np
 import itertools
 from typing import List, Dict, Tuple, Callable
 from PythonCodes.library.thresholding_base import *
+from PythonCodes.library.thresholding_levels import *
 
 def argmax_TC(prob: List[float]) -> List[int]:
     """
@@ -39,48 +40,50 @@ def argmax_TC(prob: List[float]) -> List[int]:
 
     return argmax
 
-def total_correlation(prob: List[float], levels: List[int]) -> float:
-    """
-    Compute the total correlation according to a list of breaking gray levels 
+def between_class_var(prob: List[float], levels: List[int]) -> float:
+    """Compute the variance between classes"""
+    probUpToLevel = prob_up_to_level(prob, levels)
+    amountOfProbs = len(prob)
+    cluster = gray_clustering(amountOfProbs, levels)
 
+    newCluster = list()
+    mu = list()
+
+    for value in cluster:
+        newCluster.append(value)
+        mu.append(cluster_mean(prob, newCluster, 0))
+    totalMean = cluster_mean(prob, newCluster, 0) # TODO: Consultar esto
+
+    term = list()
+    for i, m in enumerate(mu):
+        term.append(probUpToLevel[i] * m-totalMean**2)
+
+    return sum(term)
+
+def total_correlation(prob: List[float], levels: List[int]) -> float:
+    """Compute the total correlation according to a list of breaking gray levels
     Arguments:
     prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
     levels a list of gray levels which give the breaks 
-
     Value:
-    total_correlation returns an object with class 'float'
-    """
-
-    # Find the probabilities according to the given levels
-
+    total_correlation returns an object with class 'float'"""
+    
     probUpToLevel = prob_up_to_level(prob, levels)
 
-    # Find the number of breaks and probabilities
-  
-    amountOfLevels = len(levels)
+
     amountOfProbabilities = len(prob)
+    levels = [0] + levels + [amountOfProbabilities]
+    amountOfLevels = len(levels)
+
 
     # Initialize correlations list
-
     correlations = list()
 
-    correlations.append( -np.log( sum( np.square( prob[0 : (levels[0] + 1)] ) ) / probUpToLevel[0] ** 2) )
+    # Find the correlation of each interval
+    for i in range(1, amountOfLevels):
+        correlations.append( -np.log( sum( np.square( prob[(levels[i - 1]) : (levels[i])] ) ) / probUpToLevel[i - 1] ** 2) )
 
-    if (amountOfLevels == 1):
-        # Find the correlation of both intervals
-        correlations.append( -np.log( sum( np.square( prob[(levels[0] + 1) : amountOfProbabilities + 1] ) ) / probUpToLevel[1] ** 2) )
-    else:
-        # Find the correlation of each interval
-        for i in range(1, amountOfLevels):
-            correlations.append( -np.log( sum( np.square( prob[(levels[i - 1] + 1) : (levels[i] + 1)] ) ) / probUpToLevel[i] ** 2) )
-
-        correlations.append( -np.log( sum( np.square( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities] ) ) / probUpToLevel[amountOfLevels] ** 2) )
-
-    # Find the total correlation
-
-    totalCorrelation = sum(correlations)
-
-    return totalCorrelation
+    return sum(correlations)
 
 def total_entropy(prob: List[float], levels: List[int]) -> float:
     """
@@ -100,8 +103,9 @@ def total_entropy(prob: List[float], levels: List[int]) -> float:
 
     # Find the number of breaks and probabilities
   
-    amountOfLevels = len(levels)
     amountOfProbabilities = len(prob)
+    levels = [0] + levels + [amountOfProbabilities]
+    amountOfLevels = len(levels)
 
     prob = np.array(prob)
 
@@ -109,24 +113,24 @@ def total_entropy(prob: List[float], levels: List[int]) -> float:
 
     entropies = list()
 
-    entropies.append( -np.sum( np.multiply( prob[0 : levels[0] + 1], np.log( prob[0 : levels[0] + 1] / probUpToLevel[0] ) ) ) / probUpToLevel[0] )
-
-    if (amountOfLevels == 1):
-        # Find the entropy of both intervals
-        entropies.append( -np.sum( np.multiply( prob[(levels[0] + 1) : amountOfProbabilities], np.log( prob[(levels[0] + 1) : amountOfProbabilities] / probUpToLevel[1] ) ) ) / probUpToLevel[1] )
-        print(entropies)
-    else:
-        # Find the entropy of each interval
-        for i in range(1, amountOfLevels):
-            entropies.append( -np.sum( np.multiply( prob[(levels[i - 1] + 1) : (levels[i] + 1)], np.log( prob[(levels[i - 1] + 1) : (levels[i] + 1)] / probUpToLevel[i] ) ) ) / probUpToLevel[i] )
-
-        entropies.append( -np.sum( np.multiply( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities], np.log( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities] / probUpToLevel[amountOfLevels] ) ) ) / probUpToLevel[amountOfLevels] )
+    # Find the entropy of each interval
+    for i in range(1, amountOfLevels):
+        entropies.append( -np.sum( np.multiply( prob[(levels[i - 1]) : (levels[i])], np.log( prob[(levels[i - 1]) : (levels[i])] / probUpToLevel[i - 1] ) ) ) / probUpToLevel[i - 1] )
 
     # Find the total entropy
-
     totalEntropy = sum(entropies)
 
     return totalEntropy
+
+# TODO: Ask about this. This interface doesn't match the others (levels List vs level int)
+def mom1_up_to_level(prob: List[float], levels: List[int]) -> float:
+    term = list()
+
+    # Find the first-order moment of each element
+    for i, p in enumerate(prob):
+        term.append((i-1)*p)
+
+    return sum(term)
 
 def threshold_candidates(gray_levels: List[int], k: int) -> itertools.combinations:
     """Returns a generator of all combinations of k elements from gray_levels, never taking the first or last element"""
@@ -152,3 +156,6 @@ def threshold_mcc(img: np.ndarray, k: int):
 
 def threshold_mec(img: np.ndarray, k: int):
     return threshold_candidate_generic(img, k, total_entropy)
+
+def threshold_otsu(img: np.ndarray, k: int):
+    return threshold_candidate_generic(img, k, between_class_var)

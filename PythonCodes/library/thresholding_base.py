@@ -136,7 +136,7 @@ def prob_up_to_level(prob: List[float], levels: List[int]) -> float:
     
     probUpToLevel = list()
 
-    probUpToLevel.append(sum(prob[:levels[0] + 1]))
+    probUpToLevel.append(sum(prob[:levels[0]]))
 
     if (amountOfLevels == 1):
     #Find both probabilities
@@ -144,7 +144,7 @@ def prob_up_to_level(prob: List[float], levels: List[int]) -> float:
     else:
     #Find probabilities up to each level
         for i in range(1, amountOfLevels):
-            probUpToLevel.append( sum( prob[(levels[i - 1] + 1) : (levels[i] + 1)] ) )
+            probUpToLevel.append( sum( prob[(levels[i - 1]) : (levels[i])] ) )
         
         probUpToLevel.append(1 - sum(probUpToLevel))
 
