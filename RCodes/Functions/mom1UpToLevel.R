@@ -6,14 +6,14 @@
 
 # Arguments:
 # prob the probability vector of gray levels 0,1,...,L-1
-# level a gray levels which give the cut
+# a list of gray levels
 
 # Value:
 # mom1UpToLevel returns a list with class "numeric" 
 
 ############################################################################################
 
-mom1UpToLevel <- function(prob, level){
+mom1UpToLevel <- function(prob, levels){
   
   # Initialize
 

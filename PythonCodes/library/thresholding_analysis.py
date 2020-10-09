@@ -10,7 +10,7 @@ def arrow_direction(freq: List[int]) -> List[int]:
     direction = list()
 
     # First value special case
-    if freq[0] != 0 and freq[0] <= freq[1]: # TODO: Ask about this simplification (see original code)
+    if freq[0] != 0 and freq[0] <= freq[1]:
         direction.append(-1)
     else:
         direction.append(0)
@@ -25,9 +25,9 @@ def arrow_direction(freq: List[int]) -> List[int]:
         fn = freq[1+1]
 
         if f != 0 and fp>fn and fp >= f:
-            direction.append(1) # Going up
-        elif f!= 0 and fn>fp and fn>= f:
-            direction.append(-1) # Going down
+            direction.append(1) # Going down
+        elif f!= 0 and fn>fp and fn >= f:
+            direction.append(-1) # Going up
         else:
             direction.append(0) # Peak or valley
     
@@ -39,8 +39,8 @@ def arrow_direction(freq: List[int]) -> List[int]:
 
     return direction
 
-# TODO: Can we compute arrow direction inside of peak_identification instead of passing it?
-def peak_identification(direction: List[int]):
+def peak_identification(freq: List[int]):
+    direction = arrow_direction(freq)
     peaks = list()
 
     for i, d in enumerate(direction):
@@ -52,7 +52,7 @@ def peak_identification(direction: List[int]):
         if i == 0 or i == len(direction):
             continue
 
-        if d == 0 and dp == -1 and dn == 1: # TODO: Shouldn't they both be -1?
+        if d == 0 and dp == -1 and dn == 1:
             peaks.append(i)
         
     return peaks

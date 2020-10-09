@@ -69,21 +69,19 @@ def total_correlation(prob: List[float], levels: List[int]) -> float:
     total_correlation returns an object with class 'float'"""
     
     probUpToLevel = prob_up_to_level(prob, levels)
-    amountOfLevels = len(levels)
+
+
     amountOfProbabilities = len(prob)
+    levels = [0] + levels + [amountOfProbabilities]
+    amountOfLevels = len(levels)
+
 
     # Initialize correlations list
     correlations = list()
-    correlations.append( -np.log( sum( np.square( prob[0 : (levels[0] + 1)] ) ) / probUpToLevel[0] ** 2) )
 
-    if (amountOfLevels == 1):
-        # Find the correlation of both intervals
-        correlations.append( -np.log( sum( np.square( prob[(levels[0] + 1) : amountOfProbabilities + 1] ) ) / probUpToLevel[1] ** 2) )
-    else:
-        # Find the correlation of each interval
-        for i in range(1, amountOfLevels):
-            correlations.append( -np.log( sum( np.square( prob[(levels[i - 1] + 1) : (levels[i] + 1)] ) ) / probUpToLevel[i] ** 2) )
-        correlations.append( -np.log( sum( np.square( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities] ) ) / probUpToLevel[amountOfLevels] ** 2) )
+    # Find the correlation of each interval
+    for i in range(1, amountOfLevels):
+        correlations.append( -np.log( sum( np.square( prob[(levels[i - 1]) : (levels[i])] ) ) / probUpToLevel[i - 1] ** 2) )
 
     return sum(correlations)
 
@@ -105,8 +103,9 @@ def total_entropy(prob: List[float], levels: List[int]) -> float:
 
     # Find the number of breaks and probabilities
   
-    amountOfLevels = len(levels)
     amountOfProbabilities = len(prob)
+    levels = [0] + levels + [amountOfProbabilities]
+    amountOfLevels = len(levels)
 
     prob = np.array(prob)
 
@@ -114,21 +113,11 @@ def total_entropy(prob: List[float], levels: List[int]) -> float:
 
     entropies = list()
 
-    entropies.append( -np.sum( np.multiply( prob[0 : levels[0] + 1], np.log( prob[0 : levels[0] + 1] / probUpToLevel[0] ) ) ) / probUpToLevel[0] )
-
-    if (amountOfLevels == 1):
-        # Find the entropy of both intervals
-        entropies.append( -np.sum( np.multiply( prob[(levels[0] + 1) : amountOfProbabilities], np.log( prob[(levels[0] + 1) : amountOfProbabilities] / probUpToLevel[1] ) ) ) / probUpToLevel[1] )
-        print(entropies)
-    else:
-        # Find the entropy of each interval
-        for i in range(1, amountOfLevels):
-            entropies.append( -np.sum( np.multiply( prob[(levels[i - 1] + 1) : (levels[i] + 1)], np.log( prob[(levels[i - 1] + 1) : (levels[i] + 1)] / probUpToLevel[i] ) ) ) / probUpToLevel[i] )
-
-        entropies.append( -np.sum( np.multiply( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities], np.log( prob[(levels[amountOfLevels - 1] + 1) : amountOfProbabilities] / probUpToLevel[amountOfLevels] ) ) ) / probUpToLevel[amountOfLevels] )
+    # Find the entropy of each interval
+    for i in range(1, amountOfLevels):
+        entropies.append( -np.sum( np.multiply( prob[(levels[i - 1]) : (levels[i])], np.log( prob[(levels[i - 1]) : (levels[i])] / probUpToLevel[i - 1] ) ) ) / probUpToLevel[i - 1] )
 
     # Find the total entropy
-
     totalEntropy = sum(entropies)
 
     return totalEntropy
