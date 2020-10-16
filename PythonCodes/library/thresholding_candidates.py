@@ -133,7 +133,7 @@ def mom1_up_to_level(prob: List[float], levels: List[int]) -> float:
 
 def threshold_candidates(gray_levels: List[int], k: int) -> itertools.combinations:
     """Returns a generator of all combinations of k elements from gray_levels, never taking the first or last element"""
-    return itertools.combinations([x for x in range(len(gray_levels))], k)
+    return itertools.combinations([x for x in range(1, len(gray_levels) - 1)], k)
 
 def threshold_candidate_generic(img: np.ndarray, k: int, candidate_function: Callable[[List[float], List[int]], float]):
     prob = image_probabilities(img)
