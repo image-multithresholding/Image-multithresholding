@@ -26,4 +26,21 @@ def hill_identification(freq: List[float], k: int) -> Tuple[int, int]:
     return peaks, size
 
 def valley_location(freq: List[float], size: int) -> List[float]:
-    pass
+    cells = cell_histogram(freq, size)
+    direction = arrow_direction(cells)
+    
+    leftCell = list()
+    rightCell = list()
+
+    # Get all positions where direction is 1, avoiding first and last position
+    ones = [i for i, x in enumerate(direction[1::-2]) if x == 1]
+
+    for i in ones:
+        nextDirections = direction[i+1:] # TODO: This probably breaks at i = len(ones) - 1
+        if nextDirections:
+            h = i + 1 # TODO: which(aux !=0)[[1]]+i ???
+            if direction[h] == -1:
+                leftCell.append(i)
+                rightCell.append(h)
+    
+    return leftCell + rightCell # TODO: cbind(leftCell, rightCell) ?

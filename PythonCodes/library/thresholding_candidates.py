@@ -122,7 +122,6 @@ def total_entropy(prob: List[float], levels: List[int]) -> float:
 
     return totalEntropy
 
-# TODO: Ask about this. This interface doesn't match the others (levels List vs level int)
 def mom1_up_to_level(prob: List[float], levels: List[int]) -> float:
     term = list()
 
@@ -159,3 +158,30 @@ def threshold_mec(img: np.ndarray, k: int):
 
 def threshold_otsu(img: np.ndarray, k: int):
     return threshold_candidate_generic(img, k, between_class_var)
+
+def threshold_fom(img: np.ndarray, k: int):
+    prob = image_probabilities(img)
+    L = len(prob)
+
+    P = {(i, j): prob_up_to_level(prob, j-1)[1] - prob_up_to_level(prob, i-2)[1]
+            for j in range(i, L) for i in range(1, L)}
+
+    S = {(i, j): mom1_up_to_level(prob, j-1)[1] - mom1_up_to_level(prob, i-2)[1]
+            for j in range(i, L) for i in range(1, L)}
+
+    H = {(i, j): S[(i, j)**2 / P[(i, j)]]
+            for j in range(i, L) for i in range(1, L)}
+
+    for candidate in threshold_candidates([x for x in range(L)], k):
+        n = len(candidate)
+        modifiedBCVar = list()
+
+        for i, c in enumerate(candidate):
+            h = 0
+            for j in range(k):
+                h += H[(c[j-1] + 2, c[j] + 1)]
+            modifiedBCVar.append(sum(h))
+
+    m = max(modifiedBCVar)
+    
+    return modifiedBCVar.index(m)
