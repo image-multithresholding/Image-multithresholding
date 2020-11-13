@@ -71,11 +71,11 @@ def PSNR(img: np.ndarray, thImg: np.ndarray) -> np.float64:
     return psnr
 
 def image_probabilities(img: np.ndarray) -> List[float]:
-    probabilities = [.0 for _ in range(256)]
+    probabilities = [0 for _ in range(256)]
     histogram = image_histogram(img)
 
-    for gray in histogram:
-        probabilities[gray] = histogram[gray] / img.size
+    for grayLevel in range(256):
+        probabilities[grayLevel] = histogram[grayLevel] / img.size
     
     return probabilities
 
@@ -135,7 +135,7 @@ def prob_up_to_level(prob: List[float], levels: List[int]) -> float:
     
     probUpToLevel = list()
 
-    probUpToLevel.append(sum(prob[:levels[0]]))
+    probUpToLevel.append(sum(prob[:levels[0] + 1]))
 
     if (amountOfLevels == 1):
     #Find both probabilities
@@ -143,7 +143,7 @@ def prob_up_to_level(prob: List[float], levels: List[int]) -> float:
     else:
     #Find probabilities up to each level
         for i in range(1, amountOfLevels):
-            probUpToLevel.append( sum( prob[(levels[i - 1]) : (levels[i])] ) )
+            probUpToLevel.append( sum( prob[(levels[i - 1] + 1) : (levels[i] + 1)] ) )
         
         probUpToLevel.append(1 - sum(probUpToLevel))
 

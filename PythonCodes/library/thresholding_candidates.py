@@ -122,12 +122,12 @@ def total_entropy(prob: List[float], levels: List[int]) -> float:
 
     return totalEntropy
 
-def mom1_up_to_level(prob: List[float], levels: List[int]) -> float:
+def mom1_up_to_level(prob: List[float], level: int) -> float:
     term = list()
 
     # Find the first-order moment of each element
-    for i, p in enumerate(prob):
-        term.append((i-1)*p)
+    for i, p in enumerate(prob[:level + 1]):
+        term.append(i*p)
 
     return sum(term)
 
@@ -163,14 +163,14 @@ def threshold_fom(img: np.ndarray, k: int):
     prob = image_probabilities(img)
     L = len(prob)
 
-    P = {(i, j): prob_up_to_level(prob, j-1)[1] - prob_up_to_level(prob, i-2)[1]
-            for j in range(i, L) for i in range(1, L)}
+    P = {(i, j): prob_up_to_level(prob, [j])[0] - prob_up_to_level(prob, [i])[0]
+            for i in range(L) for j in range(i, L)}
 
-    S = {(i, j): mom1_up_to_level(prob, j-1)[1] - mom1_up_to_level(prob, i-2)[1]
-            for j in range(i, L) for i in range(1, L)}
+    S = {(i, j): mom1_up_to_level(prob, j) - mom1_up_to_level(prob, i)
+            for i in range(L) for j in range(i, L)}
 
-    H = {(i, j): S[(i, j)**2 / P[(i, j)]]
-            for j in range(i, L) for i in range(1, L)}
+    H = {(i, j): S[(i, j)]**2 / P[(i, j)]
+            for i in range(L) for j in range(i, L)}
 
     for candidate in threshold_candidates([x for x in range(L)], k):
         n = len(candidate)
@@ -179,8 +179,8 @@ def threshold_fom(img: np.ndarray, k: int):
         for i, c in enumerate(candidate):
             h = 0
             for j in range(k):
-                h += H[(c[j-1] + 2, c[j] + 1)]
-            modifiedBCVar.append(sum(h))
+                h += H[(candidate[j-1] + 2, candidate[j] + 1)]
+            modifiedBCVar.append(h)
 
     m = max(modifiedBCVar)
     
