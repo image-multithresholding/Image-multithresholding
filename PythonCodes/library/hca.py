@@ -42,3 +42,8 @@ def valley_location(freq: List[float], size: int) -> List[float]:
                 limits.append((i, h + i + 1))
     
     return limits
+
+def uncell(L: int, size: int) -> List[List[int]]:
+    n = math.ceil(L/size)
+    rest = L % size
+    return [[x for x in range(L)] for _ in range(size)]
