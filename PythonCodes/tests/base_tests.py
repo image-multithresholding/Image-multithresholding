@@ -3,30 +3,37 @@ import PythonCodes.library.thresholding_base as tbase
 import numpy as np
 from skimage import io
 
+
 class TestThresholdedImage(unittest.TestCase):
 
     def setUp(self):
         self.image01 = io.imread('PythonCodes/tests/image_01.jpg')
-        self.assertEquals(self.image01.shape, (600, 600)) # Check test_image_01.jpg is 600x600px
+        # Check test_image_01.jpg is 600x600px
+        self.assertEquals(self.image01.shape, (600, 600))
 
     def test_arguments(self):
         with self.assertRaises(Exception):
-            tbase.thresholded_image(self.image01, []) # Should have at least one threshold
+            # Should have at least one threshold
+            tbase.thresholded_image(self.image01, [])
         with self.assertRaises(Exception):
-            tbase.thresholded_image(self.image01, 123) # Should receive a list of thresholds
-        
+            # Should receive a list of thresholds
+            tbase.thresholded_image(self.image01, 123)
+
     def test_number_of_classes(self):
         timage = tbase.thresholded_image(self.image01, [100])
-        self.assertLessEqual(self.count_classes(timage), 2) # Check thresholded image has no more than 2 classes
+        # Check thresholded image has no more than 2 classes
+        self.assertLessEqual(self.count_classes(timage), 2)
         timage = tbase.thresholded_image(self.image01, [100, 200])
-        self.assertLessEqual(self.count_classes(timage), 3) # Check thresholded image has no more than 3 classes
+        # Check thresholded image has no more than 3 classes
+        self.assertLessEqual(self.count_classes(timage), 3)
 
     def test_class_values(self):
-        timage = tbase.thresholded_image(self.image01, [127]) # Has two classes, with means 64 (127 - 0 // 2) and 192 (255 - 127 // 2)
+        # Has two classes, with means 64 (127 - 0 // 2) and 192 (255 - 127 // 2)
+        timage = tbase.thresholded_image(self.image01, [127])
         classes = self.get_classes(timage)
         for value in [64, 192]:
             self.assertIn(value, classes)
-        
+
     def count_classes(self, timage):
         gray_values = set()
         for value in timage.flat:
@@ -38,7 +45,8 @@ class TestThresholdedImage(unittest.TestCase):
         for value in timage.flat:
             gray_values.add(value)
         return gray_values
-        
+
+
 class TestPSNR(unittest.TestCase):
 
     def setUp(self):
@@ -49,6 +57,7 @@ class TestPSNR(unittest.TestCase):
     def test_return(self):
         self.assertEquals(type(self.PSNR), np.float64)
         self.assertGreaterEqual(self.PSNR, 0)
+
 
 if __name__ == '__main__':
     unittest.main()
