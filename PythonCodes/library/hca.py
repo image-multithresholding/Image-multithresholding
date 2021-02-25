@@ -13,7 +13,7 @@ def cell_histogram(freq: List[float], size: int) -> List[float]:
 def hill_identification(freq: List[float], k: int) -> Tuple[int, int]:
     size = 0
     peaks = []
-    while len(peaks) > k or size == 0:
+    while len(peaks) > k+1 or size == 0:
         size += 1
         cells = cell_histogram(freq, size)
         peaks = peak_identification(cells)
@@ -43,7 +43,17 @@ def valley_location(freq: List[float], size: int) -> List[float]:
     
     return limits
 
+
 def uncell(L: int, size: int) -> List[List[int]]:
-    n = math.ceil(L/size)
-    rest = L % size
-    return [[x for x in range(L)] for _ in range(size)]
+    cells = []
+
+    currCells = []
+    for x in range(1, L + 1):
+        currCells.append(x)
+        if len(currCells) == size:
+            cells.append(currCells)
+            currCells = []
+    if currCells:
+        cells.append(currCells)
+    return cells
+

@@ -215,14 +215,14 @@ def threshold_fom(img: np.ndarray, k: int):
 def threshold_hca(img: np.ndarray, k: int):
     freq = image_histogram(img)
     L = len(freq)
-    cellSize = hill_identification(freq, k-1)
+    cellSize = hill_identification(freq, k-1)[1]
     cells = uncell(L, cellSize)
     valleyLocation = valley_location(freq, cellSize)
 
     threshold = list()
     for valLoc in valleyLocation:
         startLeft = cells[valLoc[0]][0]
-        endRight = cells[valLoc[2]][cellSize]
+        endRight = cells[valLoc[1]][-1]
         threshold.append(round(startLeft + (endRight - startLeft)/2))
 
     return threshold
