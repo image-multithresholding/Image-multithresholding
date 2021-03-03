@@ -1,6 +1,8 @@
 from skimage import exposure
 import numpy as np
 import itertools
+import pandas as pd
+from statsmodels.formula.api import ols
 from typing import List, Dict, Tuple, Callable
 from PythonCodes.library.thresholding_base import *
 from PythonCodes.library.thresholding_levels import *
@@ -9,10 +11,10 @@ from PythonCodes.library.hca import *
 
 def argmax_TC(prob: List[float]) -> List[int]:
     """
-    Compute the levels at which the maximum total correlation is reached 
+    Compute the levels at which the maximum total correlation is reached
 
     Arguments:
-    prob the probability list of gray levels (list of elements of class float, value from 0 to 1) 
+    prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
 
     Value:
     argmax_TC returns an object with class 'list', list of float elements
@@ -68,7 +70,7 @@ def total_correlation(prob: List[float], levels: List[int]) -> float:
     """Compute the total correlation according to a list of breaking gray levels
     Arguments:
     prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
-    levels a list of gray levels which give the breaks 
+    levels a list of gray levels which give the breaks
     Value:
     total_correlation returns an object with class 'float'"""
 
@@ -91,11 +93,11 @@ def total_correlation(prob: List[float], levels: List[int]) -> float:
 
 def total_entropy(prob: List[float], levels: List[int]) -> float:
     """
-    Compute the total entropy according to a list of breaking gray levels 
+    Compute the total entropy according to a list of breaking gray levels
 
     Arguments:
     prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
-    levels a list of gray levels which give the breaks 
+    levels a list of gray levels which give the breaks
 
     Value:
     total_correlation returns an object with class 'float'
@@ -183,7 +185,6 @@ def threshold_fom(img: np.ndarray, k: int):
 
     H = {(i, j): S[(i, j)]**2 / P[(i, j)]
          for i in range(L) for j in range(i, L)}
-
     maxModifiedBCVar = 0
     optCandidate = None
     for candidate in threshold_candidates([x for x in range(L)], k):
@@ -226,3 +227,16 @@ def threshold_hca(img: np.ndarray, k: int):
         threshold.append(round(startLeft + (endRight - startLeft)/2))
 
     return threshold
+
+
+def threshold_lra(img: np.ndarray, k: int, n: int, m: int):
+    def arg_min_rf22(x, y):
+        #x = np.arange(10)+1
+        #y = [4, 5, 20, 14, 32, 22, 38, 43, 1, 1]
+
+        d = {'x': x, 'x2': x*x, 'xy': x*y, 'x2y': x*x*y}
+        df = pd.DataFrame(data=d)
+
+        model = ols("y ~ x + x2 + xy + x2y", data=df)
+        fit = model.fit()
+        model.df_model
