@@ -234,9 +234,46 @@ def threshold_lra(img: np.ndarray, k: int, n: int, m: int):
         #x = np.arange(10)+1
         #y = [4, 5, 20, 14, 32, 22, 38, 43, 1, 1]
 
-        d = {'x': x, 'x2': x*x, 'xy': x*y, 'x2y': x*x*y}
+        d = {'x': x, 'x2': x**2, 'xy': x*y, 'x2y': x**2*y}
         df = pd.DataFrame(data=d)
 
         model = ols("y ~ x + x2 + xy + x2y", data=df)
-        fit = model.fit()
-        model.df_model
+        result = model.fit()
+        coef = pd.read_html(
+            result.summary().tables[1].as_html(), header=0, index_col=0)[0].get('coef')
+
+        def rational(z): coef['Intercept'] + coef['x'] * \
+            z + coef['x2']*z**2 / (1 - coef['xy']*z - coef['x2y']*z**2)
+
+        return min([(i, rational(i)) for i in x], key=lambda x: x[1])[0]
+
+    def arg_min_rf23(x, y):
+
+        d = {'x': x, 'x2': x**2, 'x3': x**3, 'xy': x*y, 'x2y': x**2*y}
+        df = pd.DataFrame(data=d)
+
+        model = ols("y ~ x + x2 + xy + x2y", data=df)
+        result = model.fit()
+        coef = pd.read_html(
+            result.summary().tables[1].as_html(), header=0, index_col=0)[0].get('coef')
+
+        def rational(z): coef['Intercept'] + coef['x'] * \
+            z + coef['x2']*z**2 + coef['x3']*z**3 / \
+            (1 - coef['xy']*z - coef['x2y']*z**2)
+        
+        return min([(i, rational(i)) for i in x], key=lambda x: x[1])[0]
+
+    def arg_min_rf32(x, y):
+
+        d = {'x': x, 'x2': x**2, 'xy': x*y, 'x2y': x**2*y, 'x3y': x**3*y}
+        df = pd.DataFrame(data=d)
+
+        model = ols("y ~ x + x2 + xy + x2y + x3y", data=df)
+        result = model.fit()
+        coef = pd.read_html(
+            result.summary().tables[1].as_html(), header=0, index_col=0)[0].get('coef')
+
+        def rational(z): coef['Intercept'] + coef['x'] * z + coef['x2'] * \
+            z**2 / (1 - coef['xy']*z - coef['x2y']*z**2 - coef['x3y']*z**3)
+
+        return min([(i, rational(i)) for i in x], key=lambda x: x[1])[0]
