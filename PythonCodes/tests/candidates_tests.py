@@ -16,6 +16,8 @@ class TestThresholdedImage(unittest.TestCase):
         fom_result = tcand.threshold_fom(self.image01, 2)
         self.assertEqual(fom_result, 129)
 
+    def test_lra(self):
+
 
 if __name__ == '__main__':
     unittest.main()

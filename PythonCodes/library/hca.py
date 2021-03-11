@@ -47,11 +47,11 @@ def valley_location(freq: List[float], size: int) -> List[float]:
     return limits
 
 
-def uncell(L: int, size: int) -> List[List[int]]:
+def uncell(L: int, size: int, start=1) -> List[List[int]]:
     cells = []
 
     currCells = []
-    for x in range(1, L + 1):
+    for x in range(start, L + start):
         currCells.append(x)
         if len(currCells) == size:
             cells.append(currCells)

@@ -239,18 +239,21 @@ def threshold_lra(img: np.ndarray, k: int, n: int, m: int):
         valley = cells[peakLocations[0]]
         thresholds.append(arg_min_rf(valley, freq[valley[0]:valley[-1]], n, m))
     else:
+        prevPeak = peakLocations[0]
         for i, _ in enumerate(peakLocations[:-1]):
             valley = []
-            for j in range(peakLocations[i], peakLocations[i+1]):
+            for j in range(prevPeak, peakLocations[i+1]+1):
                 valley = [*valley, *cells[j]]
+            print(f'{valley=}')
+            prevPeak = peakLocations[i+1]+1
             thresholds.append(arg_min_rf(
-                valley, freq[valley[0]:valley[-1]], n, m))
+                valley, freq[valley[0]-1:valley[-1]], n, m))
 
     return thresholds
 
 
 def arg_min_rf(x, y, n, m):
-    x = np.arange(x[0], x[-1])
+    x = np.arange(x[0], x[-1]+1)
     d = {**{'x' + str(i): x**i for i in range(1, n+1)}, **{'yx' + str(i): y*x**i
                                                            for i in range(1, m+1)}}
     df = pd.DataFrame(data=d)
@@ -260,6 +263,7 @@ def arg_min_rf(x, y, n, m):
     model = ols('y ~ ' + x_string + ' + ' + xy_string, data=df)
     result = model.fit()
     coef = result.params
+    print(f'{coef=}')
 
     def rational(z): return (coef['Intercept'] + sum([coef['x' + str(i)]*z**i for i in range(
         1, n+1)])) / (1 - sum([coef['yx' + str(i)]*z**i for i in range(1, m+1)]))
