@@ -2,6 +2,7 @@ import math
 from typing import List, Tuple
 from PythonCodes.library.thresholding_analysis import arrow_direction, peak_identification
 
+
 def cell_histogram(freq: List[float], size: int) -> List[float]:
     n = math.ceil(len(freq)/size)
 
@@ -10,7 +11,8 @@ def cell_histogram(freq: List[float], size: int) -> List[float]:
         val.append(sum(freq[i*size:min((i+1)*size, len(freq))]))
     return val
 
-def hill_identification(freq: List[float], k: int) -> Tuple[int, int]:
+
+def hill_identification(freq: List[float], k: int) -> Tuple[List[int], int]:
     size = 0
     peaks = []
     while len(peaks) > k+1 or size == 0:
@@ -20,10 +22,11 @@ def hill_identification(freq: List[float], k: int) -> Tuple[int, int]:
 
     return peaks, size
 
+
 def valley_location(freq: List[float], size: int) -> List[float]:
     cells = cell_histogram(freq, size)
     direction = arrow_direction(cells)
-    
+
     limits = list()
 
     # Get all positions where direction is 1, avoiding first and last position
@@ -40,7 +43,7 @@ def valley_location(freq: List[float], size: int) -> List[float]:
             h = min(aux)
             if direction[h + i + 1] == -1:
                 limits.append((i, h + i + 1))
-    
+
     return limits
 
 
@@ -56,4 +59,3 @@ def uncell(L: int, size: int) -> List[List[int]]:
     if currCells:
         cells.append(currCells)
     return cells
-
