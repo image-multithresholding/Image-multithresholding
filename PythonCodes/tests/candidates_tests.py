@@ -17,6 +17,7 @@ class TestThresholdedImage(unittest.TestCase):
         self.assertEqual(fom_result, 129)
 
     def test_lra(self):
+        pass
 
 
 if __name__ == '__main__':
