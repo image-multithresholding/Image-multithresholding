@@ -188,7 +188,6 @@ def threshold_fom(img: np.ndarray, k: int):
     maxModifiedBCVar = 0
     optCandidate = None
     for candidate in threshold_candidates([x for x in range(L)], k):
-        n = len(candidate)
 
         if k == 1:
             for i, _ in enumerate(candidate):
@@ -269,3 +268,59 @@ def arg_min_rf(x, y, n, m):
         1, n+1)])) / (1 - sum([coef['yx' + str(i)]*z**i for i in range(1, m+1)]))
 
     return min([(i, rational(i)) for i in x], key=lambda x: x[1])[0]
+
+def threshold_ATC(img: np.ndarray, k: int) -> List[int]:
+    """
+    Compute the optimal number of classes according to the automatic thresholding criterion 
+    proposed by Yen et al. (1995) 
+
+    Arguments:
+    img a numpy.ndarray object
+    k number of thresholds 
+
+    Value:
+    threshold_ATC returns an object with class 'list', list of integer elements
+    """
+
+    if k < 1:
+        raise Exception("The number of thresholds must be greater than or equal to 1")
+
+    image = np.copy(img)
+
+    # Find the vector of probabilities of the gray leves 0,1,...,L-1
+
+    prob = np.array(image_probabilities(image))
+
+    amountOfProbabilities = len(prob)
+
+    newClust = list(i for i in range(0, amountOfProbabilities))
+    thr = list([])
+
+    for i in range(0, k):
+
+        # Find the new threshold using maximum total correlation criterion
+        
+        thr.append(newClust[argmax_TC(prob[newClust[0] : newClust[-1] + 1] / sum(prob[newClust[0] : newClust[-1] + 1]))])
+
+        thr.sort()
+
+        # Find the classes according to the thresholds
+
+        clust = gray_clustering(amountOfProbabilities, thr)
+
+        # Find the variance per class
+
+        varClust = list()
+        
+        for j in range(0, i+2):
+
+            varClust.append(cluster_var(prob, clust[j], 0))
+
+        # Find the argmax of cluster variances
+        argMaxVar = varClust.index(max(varClust))
+
+        # Define the new lass to be partitioned
+
+        newClust = clust[argMaxVar]
+
+    return thr
