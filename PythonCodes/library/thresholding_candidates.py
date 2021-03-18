@@ -254,8 +254,8 @@ def threshold_lra(img: np.ndarray, k: int, n: int, m: int):
 
 def arg_min_rf(x, y, n, m):
     x = np.arange(x[0], x[-1]+1)
-    d = {**{'x' + str(i): x**i for i in range(1, n+1)}, **{'yx' + str(i): y*x**i
-                                                           for i in range(1, m+1)}}
+    d = {**{'x' + str(i): x**i for i in range(1, n+1)}, **
+         {'yx' + str(i): y*x**i for i in range(1, m+1)}}
     df = pd.DataFrame(data=d)
 
     x_string = ' + '.join(['x' + str(i) for i in range(1, n+1)])
