@@ -2,16 +2,17 @@ import numpy as np
 from typing import List, Dict
 from math import ceil
 
-def valleys(hist: Dict[int, int]) -> List[int]:
+
+def _valleys(hist: Dict[int, int]) -> List[int]:
     """
-Find the valleys of a histogram of gray levels 
+    Find the valleys of a histogram of gray levels
 
-Arguments:
-hist frequencies in the histogram of gray levels 0,1,...,L-1 (dictionary) 
+    Arguments:
+    hist frequencies in the histogram of gray levels 0,1,...,L-1 (dictionary)
 
-Value:
-valleys returns an object with class 'list', list of integer values
-"""
+    Value:
+    valleys returns an object with class 'list', list of integer values
+    """
 
     L = len(hist)
 
@@ -27,27 +28,27 @@ valleys returns an object with class 'list', list of integer values
 
     for i in range(1, L):
         toLeft[i] = hist[i] < hist[i-1]
-    
+
     # Find when both condition hold
 
-    both = list(i and j for i,j in zip(toRight, toLeft))
+    both = list(i and j for i, j in zip(toRight, toLeft))
 
     val = list(i for i, x in enumerate(both) if x == True)
 
     return val
 
 
-def valley_clustering(L: int, val: List[int]) -> np.ndarray:
+def _valley_clustering(L: int, val: List[int]) -> np.ndarray:
     """
-Find limits of the clusters of a histogram of gray levels according to given valleys 
+    Find limits of the clusters of a histogram of gray levels according to given valleys
 
-Arguments:
-L number of gray levels 1,...,L 
-val list of valleys
+    Arguments:
+    L number of gray levels 1,...,L
+    val list of valleys
 
-Value:
-valley_clustering returns an object with class 'np.ndarray'
-"""
+    Value:
+    valley_clustering returns an object with class 'np.ndarray'
+    """
 
     # Find the amount of clusters
 
@@ -61,31 +62,20 @@ valley_clustering returns an object with class 'np.ndarray'
 
     for i in range(1, n-1):
         clust[i] = [val[i-1], val[i] - 1]
-    
+
     clust[n-1] = [val[n-2], L-1]
 
     return clust
 
 
-def searching_window(clust: List[int]) -> np.ndarray:
-    """
-Find searching windows of a cluster as defined in Chang et al. (2002), giving first and
-last element of each cluster
-
-Arguments:
-clust a list containing the first and last element in a cluster
-
-Value:
-searching_window returns an object with class 'np.ndarray'
-"""
-
+def _searching_window(clust: List[int]) -> np.ndarray:
     # Find length of the initial cluster
-
     n = clust[1] - clust[0] + 1
 
     if n == 2:
-        w = np.transpose(np.array(clust))
-    
+        w = np.zeros((1, 2), dtype=np.uint16)
+        w[0] = np.transpose(np.array(clust))
+
     else:
         # Find length of the searching windows
 
@@ -93,11 +83,11 @@ searching_window returns an object with class 'np.ndarray'
 
         total = n - length + 1
 
-        w = np.zeros((int(total), 2), dtype=np.uint8)
+        w = np.zeros((int(total), 2), dtype=np.uint16)
 
         # Find searching windows
 
-        for j in range(0, total):
-            w[j] = [clust[0] + j , ceil(clust[0] + j + length - 1)]
-    
+        for j in range(total):
+            w[j] = [clust[0] + j, ceil(clust[0] + j + length - 1)]
+
     return w
