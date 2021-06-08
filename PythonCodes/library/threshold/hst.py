@@ -1,20 +1,30 @@
+from collections import defaultdict
 from PythonCodes.library.base import _image_probabilities, _discrete_local_min
 
 import math
 from typing import List
 import numpy as np
+import statistics
 
 
 def _partition_min(prob: List[float], n: int):
-    min_prob = 0
-    min_region = 0
-
+    valleys = {}
+    valley_values = {}
+    section_len = len(prob)//n
     for i, p in enumerate(prob):
-        if p < min_prob:
-            min_prob = p
-            min_region = i // n
+        section = i // section_len
+        if p <= valley_values.get(section, 1):
+            if p < valley_values.get(section, 1):
+                valleys[section] = []
+            valleys[section].append(i)
+            valley_values[section] = p
 
-    return min_region
+    res = []
+    for val in valleys.values():
+        for x in val:
+            res.append(x)
+
+    return res
 
 
 def threshold_hst(img: np.ndarray, k: int):
@@ -22,20 +32,23 @@ def threshold_hst(img: np.ndarray, k: int):
     val_position = _discrete_local_min(prob)
     regions = _divisors(len(prob))[1:-1]
 
-    # TODO: Debería ser una lista pero es un int?
-    min_region = [_partition_min(prob, region) for region in regions]
-    int_regions = filter(lambda x: len(x) >= k-1, min_region)
+    min_region = [_partition_min(prob, region)
+                  for region in regions]  # Minimos por región
+    # Quedarse con los que tienen al menos k-1
+    int_regions = list(filter(lambda x: len(x) >= k, min_region))
 
     intersection = [[x for x in region if x in val_position]
                     for region in int_regions]
 
-    thresholds = []
-    number_region = []
-    for i, clust in enumerate(intersection):
-        thresholds.append([])  # TODO: Preguntar por promedio?
-        number_region.append(regions[i+len(regions)-len(int_regions)])
+    thresholds = defaultdict(list)
+    for th in range(k):
+        for i, clust in enumerate(intersection):
+            size = math.ceil(len(clust)/k)
+            cluster_section = clust[size*th:size*(th+1)]
+            thresholds[regions[i]].append(math.ceil(
+                statistics.mean(cluster_section)))
 
-    # TODO: ???
+    return thresholds
 
 
 def _divisors(n):
@@ -44,6 +57,6 @@ def _divisors(n):
         if n % i == 0:
             divs.append(i)
             if n / i not in divs:
-                divs.append(n / i)
+                divs.append(n // i)
     divs.append(n)
-    return divs
+    return sorted(divs)
