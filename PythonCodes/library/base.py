@@ -3,7 +3,7 @@ import numpy as np
 import itertools
 from typing import List, Dict, Tuple, Callable
 from math import sqrt, pi, exp, ceil
-from numba import njit, jit
+# from numba import njit, jit
 
 
 def load_image(path: str) -> np.ndarray:
@@ -126,7 +126,7 @@ def _prob_up_to_level(prob: List[float], levels: List[int]) -> float:
     if(amountOfLevels > len(prob)):
         raise Exception("more levels than len of prob")
     for i, level in enumerate(levels):
-        if type(level) != int:
+        if type(level) == float:
             raise Exception(f"non-integer level: {level}")
         # Replace -1 with 0 to mimic R
         if level == -1:
@@ -261,18 +261,19 @@ weighted_gaussian returns an object with class float
     return gV
 
 
-def _cluster_mean(prob: List[float], clust: List[int], start: int) -> float:
+def _cluster_mean(prob: List[float], clust: List[int], start: int, adjust: int = 1) -> float:
+    # TODO: revisar parámetro adjust (gaa usa 0, el resto 1 por defecto)
     """
-Compute the mean of a given cluster 
+    Compute the mean of a given cluster 
 
-Arguments:
-prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
-clust a cluster of the gray levels (list of elements of class int)
-start 0 or 1 (int) for gray levels 0,...,L-1 or 1,...,L, respectively 
+    Arguments:
+    prob the probability list of gray levels (list of elements of class float, value from 0 to 1)
+    clust a cluster of the gray levels (list of elements of class int)
+    start 0 or 1 (int) for gray levels 0,...,L-1 or 1,...,L, respectively 
 
-Value:
-cluster_mean returns an object with class float
-"""
+    Value:
+    cluster_mean returns an object with class float
+    """
     # Initialize term list and cluster prbability accumulator
 
     term = list()
@@ -282,7 +283,7 @@ cluster_mean returns an object with class float
     # and compute the cluster probability
 
     for grayLevel in clust:
-        term.append((grayLevel - 1 + start) * prob[grayLevel - start])
+        term.append((grayLevel - adjust + start) * prob[grayLevel - start])
         clusterProb += prob[grayLevel - start]
 
     # Compute the cluster mean
@@ -491,3 +492,20 @@ def _discrete_local_min(prob: List[float]) -> float:
         if s < 0 and slope[i+1] > 0:
             result.append(i+1)
     return result
+
+def _between_class_var(prob: List[float], levels: List[int]) -> float:
+    """Compute the variance between classes"""
+    probUpToLevel = _prob_up_to_level(prob, levels)
+    amountOfProbs = len(prob)
+    cluster = _gray_clustering(amountOfProbs, [l+1 for l in levels])
+    mu = list()
+
+    for c in cluster:
+        mu.append(_cluster_mean(prob, c, 0, adjust=0))
+    totalMean = _cluster_mean(prob, [x for x in range(amountOfProbs)], 0, adjust=0)
+
+    term = list()
+    for i, m in enumerate(mu):
+        term.append(probUpToLevel[i] * (m-totalMean)**2)
+
+    return sum(term)
