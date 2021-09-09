@@ -493,6 +493,7 @@ def _discrete_local_min(prob: List[float]) -> float:
             result.append(i+1)
     return result
 
+
 def _between_class_var(prob: List[float], levels: List[int]) -> float:
     """Compute the variance between classes"""
     probUpToLevel = _prob_up_to_level(prob, levels)
