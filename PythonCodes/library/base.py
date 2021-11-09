@@ -81,11 +81,11 @@ def PSNR(img: np.ndarray, thImg: np.ndarray) -> np.float64:
 
 
 def _image_probabilities(img: np.ndarray) -> List[float]:
-    probabilities = [0 for _ in range(256)]
     histogram = _image_histogram(img)
+    probabilities = [0 for _ in range(len(histogram))]
 
-    for grayLevel in range(256):
-        probabilities[grayLevel] = histogram[grayLevel] / img.size
+    for i, h in enumerate(histogram):
+        probabilities[i] = h / img.size
 
     return probabilities
 
