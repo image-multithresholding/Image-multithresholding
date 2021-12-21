@@ -4,6 +4,11 @@ import random
 
 from src.image_multi_thresholding.base import _between_class_var, _image_probabilities
 
+"""
+Find thresholds of the gray levels using shuffled frog-leaping algorithm with between 
+class variance as fitness function.
+"""
+
 
 def _is_valid_frog(frog, L):
     return (len(set(frog)) == len(frog) and frog[0] != 0 and frog[-1] != L-1)
@@ -11,12 +16,46 @@ def _is_valid_frog(frog, L):
 
 @dataclass()
 class SFLOptions:
+    """Options to be passed to the threshold_sfl function."""
     number_memeplex: int = 4
+    """Number of memeplexes."""
     number_frog: int = 10
+    """Number of frogs in each memeplex."""
     number_evolution: int = 10
+    """Total of replication in memeplex evolution."""
 
 
-def threshold_sfl(img: np.ndarray, k: int, iter: int = 100, options: SFLOptions = SFLOptions()):
+def threshold_sfl(
+        img: np.ndarray,
+        k: int,
+        iter: int = 100,
+        options: SFLOptions = SFLOptions()):
+    """Find thresholds of the gray levels using shuffled frog-leaping algorithm.
+
+    Uses between class variance as a fitness function. SFLOptions has default recommended
+    values for this algorithm, but you can change them by creating a new instance of it
+    with your preferred values.
+
+    **Arguments**:
+
+        img: A 2D numpy.ndarray containing the pixel values of the image.
+        k: Number of thresholds to find.
+        iter: Number of iterations for the algorithm.
+        options: If set, overrides the default options for the algorithm.
+
+    **Typical usage example**:
+
+        img = base.load_image('/route/to/image.png')
+        options = SFLOptions(
+            number_memeplex = 42
+        )
+        thresholds = threshold_sfl(
+            img = img,
+            k = 10,
+            options = options
+        )
+    """
+
     prob = _image_probabilities(img)
     L = len(prob)
 
@@ -35,9 +74,7 @@ def threshold_sfl(img: np.ndarray, k: int, iter: int = 100, options: SFLOptions 
 
     while counter < iter:
         sort_indeces = np.flip(np.argsort(bcv))
-        # print(f'{sort_indeces=}')
         sorted_frogs = np.array([frogs[i] for i in sort_indeces])
-        # print(f'{sorted_frogs=}')
         all_frogs = []
         for m in range(options.number_memeplex):
             memeplex_frogs = np.array(
@@ -58,7 +95,6 @@ def threshold_sfl(img: np.ndarray, k: int, iter: int = 100, options: SFLOptions 
                     else:
                         new_worst_frog = np.sort(
                             worst_frog + random.random()*(best_global_frog - worst_frog)).astype(np.int16)
-                        # print(f'{new_worst_frog=}')
                         if _is_valid_frog(new_worst_frog, L) and _between_class_var(prob, new_worst_frog) > _between_class_var(prob, worst_frog):
                             memeplex_frogs[worst_position] = new_worst_frog
                         else:
@@ -69,8 +105,6 @@ def threshold_sfl(img: np.ndarray, k: int, iter: int = 100, options: SFLOptions 
             if len(all_frogs) == 0:
                 all_frogs = memeplex_frogs
             else:
-                # print(f'{all_frogs=}')
-                # print(f'{memeplex_frogs=}')
                 all_frogs = np.concatenate((all_frogs, memeplex_frogs))
 
         bcv = np.array([_between_class_var(prob, frog)
