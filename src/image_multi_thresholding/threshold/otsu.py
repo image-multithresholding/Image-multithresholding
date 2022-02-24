@@ -1,5 +1,5 @@
 import numpy as np
-from PythonCodes.library.base import _threshold_candidate_generic, _prob_up_to_level, _threshold_candidates, _image_probabilities, _cluster_mean, _gray_clustering
+from src.image_multi_thresholding.base import _threshold_candidate_generic, _prob_up_to_level, _threshold_candidates, _image_probabilities, _cluster_mean, _gray_clustering
 from typing import List
 
 

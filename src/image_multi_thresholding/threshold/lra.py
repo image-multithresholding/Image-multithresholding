@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from PythonCodes.library.base import _image_histogram, _hill_identification, _uncell
+from src.image_multi_thresholding.base import _image_histogram, _hill_identification, _uncell
 from statsmodels.formula.api import ols
 
 

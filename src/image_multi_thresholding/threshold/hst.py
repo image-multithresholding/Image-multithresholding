@@ -1,5 +1,5 @@
 from collections import defaultdict
-from PythonCodes.library.base import _image_probabilities, _discrete_local_min
+from src.image_multi_thresholding.base import _image_probabilities, _discrete_local_min
 
 import math
 from typing import List

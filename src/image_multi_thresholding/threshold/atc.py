@@ -1,6 +1,6 @@
 import numpy as np
 from typing import List
-from PythonCodes.library.base import _image_probabilities, _gray_clustering, _total_correlation, _cluster_var
+from src.image_multi_thresholding.base import _image_probabilities, _gray_clustering, _total_correlation, _cluster_var
 
 
 def _argmax_TC(prob: List[float]) -> List[int]:

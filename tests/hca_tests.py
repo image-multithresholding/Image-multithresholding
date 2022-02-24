@@ -1,7 +1,7 @@
 import unittest
-import PythonCodes.library.thresholding_base as tbase
-import PythonCodes.library.thresholding_candidates as tcand
-import PythonCodes.library.hca as thca
+import src.image_multi_thresholding.thresholding_base as tbase
+import src.image_multi_thresholding.thresholding_candidates as tcand
+import src.image_multi_thresholding.hca as thca
 import numpy as np
 from skimage import io
 

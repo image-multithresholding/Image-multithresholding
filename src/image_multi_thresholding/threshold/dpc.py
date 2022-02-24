@@ -1,5 +1,5 @@
-from PythonCodes.library.base import _weighted_gaussian, _image_histogram, _optimal_window, _cluster_estimations, _discrete_local_min
-from PythonCodes.library.thresholding_windows import _valleys, _valley_clustering, _searching_window
+from src.image_multi_thresholding.base import _weighted_gaussian, _image_histogram, _optimal_window, _cluster_estimations, _discrete_local_min
+from src.image_multi_thresholding.thresholding_windows import _valleys, _valley_clustering, _searching_window
 from typing import List
 import numpy as np
 from math import pi, cos

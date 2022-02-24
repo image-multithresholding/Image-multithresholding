@@ -1,6 +1,6 @@
 import unittest
-import PythonCodes.library.thresholding_base as tbase
-import PythonCodes.library.thresholding_candidates as tcand
+import src.image_multi_thresholding.thresholding_base as tbase
+import src.image_multi_thresholding.thresholding_candidates as tcand
 import numpy as np
 from skimage import io
 
@@ -8,7 +8,7 @@ from skimage import io
 class TestThresholdedImage(unittest.TestCase):
 
     def setUp(self):
-        self.image01 = io.imread('PythonCodes/tests/image_01.jpg')
+        self.image01 = io.imread('src/tests/image_01.jpg')
         # Check test_image_01.jpg is 600x600px
         self.assertEquals(self.image01.shape, (600, 600))
 

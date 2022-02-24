@@ -1,5 +1,5 @@
 import unittest
-import PythonCodes.library.base as base
+import src.image_multi_thresholding.base as base
 import numpy as np
 from skimage import io
 
@@ -7,7 +7,7 @@ from skimage import io
 class TestThresholdedImage(unittest.TestCase):
 
     def setUp(self):
-        self.image01 = base.load_image('PythonCodes/tests/image_01.jpg')
+        self.image01 = base.load_image('src/tests/image_01.jpg')
         # Check test_image_01.jpg is 600x600px
         self.assertEquals(self.image01.shape, (600, 600))
 
@@ -50,7 +50,7 @@ class TestThresholdedImage(unittest.TestCase):
 class TestPSNR(unittest.TestCase):
 
     def setUp(self):
-        self.image01 = base.load_image('PythonCodes/tests/image_01.jpg')
+        self.image01 = base.load_image('src/tests/image_01.jpg')
         self.thresholded01 = base._thresholded_image(self.image01, [127])
         self.PSNR = base.PSNR(self.image01, self.thresholded01)
 
