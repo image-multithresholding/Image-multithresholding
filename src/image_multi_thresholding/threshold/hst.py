@@ -1,5 +1,5 @@
 from collections import defaultdict
-from src.image_multi_thresholding.base import _image_probabilities, _discrete_local_min
+from image_multi_thresholding.base import _image_probabilities, _discrete_local_min
 
 import math
 from typing import List
@@ -27,7 +27,7 @@ def _partition_min(prob: List[float], n: int):
     return res
 
 
-def threshold_hst(img: np.ndarray, k: int):
+def threshold_hst(img: np.ndarray, k: int, region_count: int = 128):
     prob = _image_probabilities(img)
     val_position = _discrete_local_min(prob)
     regions = _divisors(len(prob))[1:-1]
@@ -48,7 +48,7 @@ def threshold_hst(img: np.ndarray, k: int):
             thresholds[regions[i]].append(math.ceil(
                 statistics.mean(cluster_section)))
 
-    return thresholds
+    return thresholds[region_count]
 
 
 def _divisors(n):

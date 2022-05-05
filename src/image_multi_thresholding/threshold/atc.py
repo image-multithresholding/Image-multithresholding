@@ -1,6 +1,6 @@
 import numpy as np
 from typing import List
-from src.image_multi_thresholding.base import _image_probabilities, _gray_clustering, _total_correlation, _cluster_var
+from image_multi_thresholding.base import _image_probabilities, _gray_clustering, _total_correlation, _cluster_var
 
 
 def _argmax_TC(prob: List[float]) -> List[int]:
@@ -17,6 +17,7 @@ def _argmax_TC(prob: List[float]) -> List[int]:
     # Find the amount of gray levels equal to the amount of probabilities
 
     amountOfProbabilities = len(prob)
+    print(f'{amountOfProbabilities=}')
 
     # Initialize totalCorrelations list
 
@@ -25,7 +26,7 @@ def _argmax_TC(prob: List[float]) -> List[int]:
     # Find the total correlation varying the break level
     # (notice that it makes no sense to consider the interval extrems since no partition holds)
 
-    for i in range(0, amountOfProbabilities - 2):
+    for i in range(1, amountOfProbabilities - 1):
         totalCorrelations.append(_total_correlation(prob, [i]))
 
     # Find the maximum total correlation
@@ -35,6 +36,7 @@ def _argmax_TC(prob: List[float]) -> List[int]:
     # Find the level at which the maximum total entropy is reached
 
     argmax = totalCorrelations.index(maxTotalCorrelation)
+    print(f'{totalCorrelations=}')
 
     return argmax
 
@@ -85,7 +87,6 @@ def threshold_atc(img: np.ndarray, k: int) -> List[int]:
         varClust = list()
 
         for j in range(0, i+2):
-
             varClust.append(_cluster_var(prob, clust[j], 0))
 
         # Find the argmax of cluster variances

@@ -2,7 +2,7 @@ from typing import Callable, List, Tuple
 import random
 import numpy as np
 from functools import partial
-from src.image_multi_thresholding.base import _between_class_var, _image_probabilities
+from image_multi_thresholding.base import _between_class_var, _image_probabilities
 
 
 def _expansion(x: np.array, expansionFactor: float) -> np.array:

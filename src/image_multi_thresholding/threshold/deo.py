@@ -3,7 +3,7 @@ from typing import List, Literal
 import numpy as np
 import random
 
-from src.image_multi_thresholding.base import _between_class_var, _image_probabilities
+from image_multi_thresholding.base import _between_class_var, _image_probabilities
 
 
 def _objective_error(prob: List[float], priori_prob: List[float], means: List[float], vars: List[float], penalty: float):
@@ -16,8 +16,6 @@ def _objective_error(prob: List[float], priori_prob: List[float], means: List[fl
 
 
 def _normal_sum(x, priori_prob, means, vars):
-    if any([v == 0 for v in vars]):
-        print(f'{x=} {priori_prob=} {means=} {vars=}')
     return sum(
         (p/math.sqrt(2*math.pi*vars[i]) *
          math.exp(-(x-means[i])**2/(2*vars[i]))
@@ -35,7 +33,6 @@ def BetweenClassVar():
             self.max_thr = len(prob)-1
 
         def generate_initial_solutions(self):
-            print('Generando soluciones iniciales')
             self.solutions = np.array(
                 [[random.randint(self.min_thr, self.max_thr) for _ in range(self.k)]
                     for _ in range(self.number_pop)]
@@ -155,9 +152,6 @@ def GaussianError(penalty: float = 1.5):
                     self.crossed_vectors_prior_prob[i] = self.mutant_vectors_prior_prob[i]
                     self.crossed_vectors_mean[i] = self.mutant_vectors_mean[i]
                     self.crossed_vectors_var[i] = self.mutant_vectors_var[i]
-                    if self.crossed_vectors_var[i][0] < 0:
-                        print(self._is_solution_in_range(
-                            self.mutant_vectors_prior_prob[i], self.mutant_vectors_mean[i], self.mutant_vectors_var[i]))
                 else:
                     self.crossed_vectors_prior_prob[i] = self.prior_prob[i]
                     self.crossed_vectors_mean[i] = self.mean[i]
@@ -201,7 +195,7 @@ def GaussianError(penalty: float = 1.5):
     return GE
 
 
-def threshold_deo(img: np.ndarray, k: int, iter: int = 1000, number_pop: int = 40,
+def threshold_deo(img: np.ndarray, k: int, iter: int = 10, number_pop: int = 40,
                   mutation_factor: float = 0.5, crossover_constant: float = 0.1, fitness_function: any = BetweenClassVar()):
 
     prob = _image_probabilities(img)

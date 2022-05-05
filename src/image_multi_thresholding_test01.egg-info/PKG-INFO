@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: image-multi-thresholding-test01
-Version: 0.0.1
+Version: 0.0.5
 Summary: Library of functions for image thresholding
 Home-page: https://github.com/arey1911/Image-multi-thresholding
 Author: UTN FRBA
@@ -19,4 +19,14 @@ License-File: LICENSE
 
 TODO: Write description
 
+
+## How to install
+
+Install from the test PyPI repository by running:
+
+```
+python3 -m pip install --index-url https://test.pypi.org/simple --no-deps image-multi-thresholding-test01
+```
+
+After that, you'll be able to import any files from the `image_multi_thresholding` package inside your Python projects.
 

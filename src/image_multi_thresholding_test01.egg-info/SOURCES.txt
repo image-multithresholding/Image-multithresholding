@@ -6,6 +6,7 @@ src/image_multi_thresholding/__init__.py
 src/image_multi_thresholding/base.py
 src/image_multi_thresholding/thresholding_windows.py
 src/image_multi_thresholding/threshold/__init__.py
+src/image_multi_thresholding/threshold/abc.py
 src/image_multi_thresholding/threshold/aco.py
 src/image_multi_thresholding/threshold/atc.py
 src/image_multi_thresholding/threshold/deo.py

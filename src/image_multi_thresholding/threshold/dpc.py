@@ -1,5 +1,5 @@
-from src.image_multi_thresholding.base import _weighted_gaussian, _image_histogram, _optimal_window, _cluster_estimations, _discrete_local_min
-from src.image_multi_thresholding.thresholding_windows import _valleys, _valley_clustering, _searching_window
+from image_multi_thresholding.base import _weighted_gaussian, _image_histogram, _optimal_window, _cluster_estimations, _discrete_local_min
+from image_multi_thresholding.thresholding_windows import _valleys, _valley_clustering, _searching_window
 from typing import List
 import numpy as np
 from math import pi, cos
@@ -46,17 +46,17 @@ def _smoothed_histogram(img: np.ndarray, p: int) -> List[int]:
     return [round(s/size) for s in smooth]
 
 
-def _bin_value(img: np.ndarray, maxk: int) -> int:
+def _bin_value(img: np.ndarray, mink: int) -> int:
     k = []
     for p in range(1, 101):
         smooth = _smoothed_histogram(img, p)
         val = _valleys(smooth)
         k.append(len(val) + 1)
 
-    nearest = abs(k[0] - maxk)
+    nearest = abs(k[0] - mink)
     nearestIndex = 0
     for i, curr in enumerate(k):
-        diff = abs(curr-maxk)
+        diff = abs(curr-mink)
         if diff < nearest:
             nearest = diff
             nearestIndex = i
@@ -64,10 +64,10 @@ def _bin_value(img: np.ndarray, maxk: int) -> int:
     return nearestIndex + 1
 
 
-def threshold_dpc(img: np.ndarray, maxk: int) -> List[int]:
+def threshold_dpc(img: np.ndarray, mink: int) -> List[int]:
     # Add 1 to k to set the maximum amount of classes (to be consistent)
-    maxk += 1
-    p = _bin_value(img, maxk)
+    mink += 1
+    p = _bin_value(img, mink)
     hist = _smoothed_histogram(img, p)
 
     hist_sum = sum(hist)

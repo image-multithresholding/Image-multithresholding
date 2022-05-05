@@ -1,6 +1,6 @@
 import numpy as np
 from typing import List
-from src.image_multi_thresholding.base import _prob_up_to_level, _threshold_candidate_generic
+from image_multi_thresholding.base import _prob_up_to_level, _threshold_candidate_generic
 
 
 def _total_entropy(prob: List[float], levels: List[int]) -> float:

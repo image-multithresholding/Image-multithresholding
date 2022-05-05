@@ -126,8 +126,8 @@ def _prob_up_to_level(prob: List[float], levels: List[int]) -> float:
     if(amountOfLevels > len(prob)):
         raise Exception("more levels than len of prob")
     for i, level in enumerate(levels):
-        if type(level) != int:
-            raise Exception(f"non-integer level: {level}")
+        # if type(level) != int:
+        #     raise Exception(f"non-integer level: {level} {type(level)}")
         # Replace -1 with 0 to mimic R
         if level == -1:
             levels[i] = 0
@@ -202,9 +202,25 @@ def _skewness(prob: List[float], clust: List[int]) -> float:
 
     return skewness
 
+def _between_class_var(prob: List[float], levels: List[int]) -> float:
+    """Compute the variance between classes"""
+    probUpToLevel = _prob_up_to_level(prob, levels)
+    amountOfProbs = len(prob)
+    clusters = _gray_clustering(amountOfProbs, levels)
+
+    mu = list()
+
+    for cluster in clusters:
+        mu.append(_cluster_mean(prob, cluster, 0))
+    totalMean = _cluster_mean(prob, [x for x in range(len(prob))], 0)
+
+    term = list()
+    for i, m in enumerate(mu):
+        term.append(probUpToLevel[i] * (m-totalMean)**2)
+
+    return sum(term)
 
 def _optimal_window(prob: List[float], w: np.ndarray) -> List[int]:
-    print(w)
     if w[0][1] - w[0][0] != 1:
         skew = list()
         for wj in w:
@@ -282,10 +298,8 @@ cluster_mean returns an object with class float
     # and compute the cluster probability
 
     for grayLevel in clust:
-        term.append((grayLevel - 1 + start) * prob[grayLevel - start])
+        term.append((grayLevel) * prob[grayLevel - start])
         clusterProb += prob[grayLevel - start]
-
-    # Compute the cluster mean
 
     clusterMean = sum(term) / clusterProb
 
@@ -310,7 +324,6 @@ cluster_mean returns an object with class float
     clusterProb = 0
 
     # Compute the cluster mean
-
     clusterMean = _cluster_mean(prob, clust, start)
 
     # Compute the variance of each element in the cluster
@@ -334,7 +347,7 @@ def _gray_clustering(levels: int, breakPositions: List[int], levelsOffset: int =
     # Iterate over every level.
     for x in range(levelsOffset, levelsOffset + levels):
         # If we have to break at this level, start a new list.
-        if x in breakPositions:
+        if x - 1 in breakPositions:
             clusters.append([x])
         # If not, just add this level to the last created cluster.
         else:
@@ -361,9 +374,10 @@ def _total_correlation(prob: List[float], levels: List[int]) -> float:
     correlations = list()
 
     # Find the correlation of each interval
-    for i in range(1, amountOfLevels):
+    #correlations.append(-np.log(sum(prob[:levels[0]]**2)/probUpToLevel[0]**2))
+    for i in range(0, amountOfLevels-1):
         correlations.append(-np.log(
-            sum(np.square(prob[(levels[i - 1]): (levels[i])])) / probUpToLevel[i - 1] ** 2))
+            sum(np.square(prob[(levels[i]): (levels[i+1])])) / probUpToLevel[i] ** 2))
 
     return sum(correlations)
 
@@ -373,16 +387,16 @@ def _threshold_candidates(gray_levels: List[int], k: int) -> itertools.combinati
     return itertools.combinations([x for x in range(1, len(gray_levels) - 1)], k)
 
 
-def _threshold_candidate_generic(img: np.ndarray, k: int, candidate_function: Callable[[List[float], List[int]], float]):
+def _threshold_candidate_generic(img: np.ndarray, k: int, candidate_function: Callable[[List[float], List[int]], float], is_max=True):
     prob = _image_probabilities(img)
 
-    max_generic = 0
+    max_generic = 0 if is_max else np.inf
     max_generic_candidate = 0
 
     # Get the candidate with the highest total value for the candidate_function
     for candidate in _threshold_candidates(prob, k):
-        value = candidate_function(prob, candidate)
-        if value > max_generic:
+        value = candidate_function(prob, list(candidate))
+        if (value > max_generic and is_max) or (value < max_generic and not is_max):
             max_generic = value
             max_generic_candidate = candidate
 

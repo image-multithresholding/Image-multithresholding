@@ -1,7 +1,7 @@
 import numpy as np
 import math
 from typing import List, Tuple
-from src.image_multi_thresholding.base import _arrow_direction, _peak_identification, _hill_identification, _cell_histogram, _image_histogram, _uncell
+from image_multi_thresholding.base import _arrow_direction, _peak_identification, _hill_identification, _cell_histogram, _image_histogram, _uncell
 
 
 def _valley_location(freq: List[float], size: int) -> List[float]:

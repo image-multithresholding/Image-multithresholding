@@ -2,7 +2,7 @@ from typing import List, Literal
 import numpy as np
 import random
 import math
-from src.image_multi_thresholding.base import _between_class_var, _cluster_mean, _cluster_var, _image_histogram, _image_probabilities, _prob_up_to_level, _gray_clustering
+from image_multi_thresholding.base import _between_class_var, _cluster_mean, _cluster_var, _image_histogram, _image_probabilities, _prob_up_to_level, _gray_clustering
 
 
 def _within_class_var(prob: List[float], levels: List[int]) -> int:
@@ -12,7 +12,7 @@ def _within_class_var(prob: List[float], levels: List[int]) -> int:
     var = [_cluster_var(prob, c, 0) for c in clusters]
 
     total_mean = _cluster_mean(
-        prob, [i for i, _ in enumerate(prob)], 0, adjust=0)
+        prob, [i for i, _ in enumerate(prob)], 0)
     total_var = sum([(i-total_mean)**2*prob[i] for i, _ in enumerate(prob)])
 
     return sum(var)/total_var
@@ -40,13 +40,15 @@ def _binary_to_decimal(chromo: List[Literal[0, 1]], K: int) -> List[int]:
 
 
 def _RWS(prob: List[float], pop: List[List[Literal[0, 1]]], K: int) -> List[int]:
-    n = len(pop)
     thr = [_binary_to_decimal(p, K) for p in pop]
 
     fit_pop = [_fitness_function(prob, t) for t in thr]
     s = sum(fit_pop)
     r = random.random()*s
-    previous_hypothesis = [sum(fit_pop[:i]) for i in range(1, n+1)]
+    previous_hypothesis = [sum(fit_pop[:i]) for i in range(1, len(fit_pop)+1)]
+    # print(fit_pop)
+    # print(previous_hypothesis)
+    # print(r)
 
     m = list(filter(lambda x: x > r, previous_hypothesis))[0]
     return pop[previous_hypothesis.index(m)]
@@ -79,7 +81,6 @@ def threshold_gaa(img: np.ndarray, k: int, iter: int = 200, pop_size: int = 10, 
     prob = _image_probabilities(img)
 
     bits = int(math.log(len(hist)) / math.log(2))
-    print(f'{bits=}')
 
     initial_pop = [_bit_vector(bits*k) for _ in range(pop_size)]
 

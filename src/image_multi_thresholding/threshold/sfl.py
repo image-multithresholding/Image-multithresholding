@@ -2,7 +2,7 @@ import numpy as np
 from dataclasses import dataclass
 import random
 
-from src.image_multi_thresholding.base import _between_class_var, _image_probabilities
+from image_multi_thresholding.base import _between_class_var, _image_probabilities
 
 """
 Find thresholds of the gray levels using shuffled frog-leaping algorithm with between 

@@ -1,27 +1,6 @@
 import numpy as np
-from src.image_multi_thresholding.base import _threshold_candidate_generic, _prob_up_to_level, _threshold_candidates, _image_probabilities, _cluster_mean, _gray_clustering
+from image_multi_thresholding.base import _between_class_var, _threshold_candidate_generic, _prob_up_to_level, _threshold_candidates, _image_probabilities, _cluster_mean, _gray_clustering
 from typing import List
-
-
-def _between_class_var(prob: List[float], levels: List[int]) -> float:
-    """Compute the variance between classes"""
-    probUpToLevel = _prob_up_to_level(prob, levels)
-    amountOfProbs = len(prob)
-    cluster = _gray_clustering(amountOfProbs, levels)
-
-    newCluster = list()
-    mu = list()
-
-    for value in cluster:
-        newCluster.append(value)
-        mu.append(_cluster_mean(prob, newCluster, 0))
-    totalMean = _cluster_mean(prob, newCluster, 0)  # TODO: Consultar esto
-
-    term = list()
-    for i, m in enumerate(mu):
-        term.append(probUpToLevel[i] * m-totalMean**2)
-
-    return sum(term)
 
 
 def _mom1_up_to_level(prob: List[float], level: int) -> float:

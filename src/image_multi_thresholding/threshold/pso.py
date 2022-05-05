@@ -2,7 +2,7 @@ import numpy as np
 import random
 import math
 from dataclasses import dataclass
-from src.image_multi_thresholding.base import _between_class_var, _image_probabilities
+from image_multi_thresholding.base import _between_class_var, _image_probabilities
 
 
 @dataclass()
@@ -20,7 +20,7 @@ def is_valid_position(vector: np.ndarray, k: int, L: int):
     return len(set(vector)) == k and vector[0] != 0 and vector[-1] != L-1
 
 
-def threshold_pso(img: np.ndarray, k: int, options: PSOOptions, iterations: int = 10):
+def threshold_pso(img: np.ndarray, k: int, options: PSOOptions = PSOOptions(), iterations: int = 10):
     prob = _image_probabilities(img)
     L = len(prob)
 
@@ -68,8 +68,6 @@ def threshold_pso(img: np.ndarray, k: int, options: PSOOptions, iterations: int 
             for i, new_part in enumerate(new_particle_position):
                 if new_part[0] <= 0 or new_part[-1] >= L-1:
                     new_particle_position[i] = particle_position[i]
-                # else:
-                #     print(new_part)
 
         particle_position = new_particle_position
         particle_fitness = [0 if not is_valid_position(

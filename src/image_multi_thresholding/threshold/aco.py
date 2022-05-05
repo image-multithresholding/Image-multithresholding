@@ -1,6 +1,6 @@
 import numpy as np
 from dataclasses import dataclass
-from src.image_multi_thresholding.base import _between_class_var, _image_probabilities
+from image_multi_thresholding.base import _between_class_var, _image_probabilities
 from random import random, randrange
 
 
@@ -81,8 +81,8 @@ def threshold_aco(img: np.ndarray, k: int, iter: int = 100, options: ACOOptions 
                         max_tau = max(
                             [t**options.pheromone_intensity for t in tau[i][hsr[i][0]:hsr[i][1]]])
                     # print(f'{max_tau=}')
-                    print(max_tau)
-                    print(tau[i])
+                    # print(max_tau)
+                    # print(tau[i])
                     arg_max_tau = np.argmax(max_tau)
                     # print(f'{arg_max_tau=}')
                     ants[h][i] = arg_max_tau + hsr[i][0]
