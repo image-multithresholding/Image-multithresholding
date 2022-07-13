@@ -24,6 +24,7 @@ Please cite the Image Multi Thresholding package as follows:
     title        = {Image Multithresholding: A Python package},
     month        = jul,
     year         = 2022,
+    publisher    = {PyPi},
     version      = {latest},
     url          = {https://github.com/image-multithresholding/Image-multithresholding}
 }
