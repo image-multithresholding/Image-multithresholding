@@ -114,4 +114,4 @@ def threshold_sfl(
 
         counter += 1
 
-    return best_global_frog
+    return sorted(best_global_frog.tolist())

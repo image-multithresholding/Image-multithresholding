@@ -17,7 +17,6 @@ def _argmax_TC(prob: List[float]) -> List[int]:
     # Find the amount of gray levels equal to the amount of probabilities
 
     amountOfProbabilities = len(prob)
-    print(f'{amountOfProbabilities=}')
 
     # Initialize totalCorrelations list
 
@@ -36,7 +35,6 @@ def _argmax_TC(prob: List[float]) -> List[int]:
     # Find the level at which the maximum total entropy is reached
 
     argmax = totalCorrelations.index(maxTotalCorrelation)
-    print(f'{totalCorrelations=}')
 
     return argmax
 

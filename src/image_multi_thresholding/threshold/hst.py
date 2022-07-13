@@ -45,6 +45,8 @@ def threshold_hst(img: np.ndarray, k: int, region_count: int = 128):
         for i, clust in enumerate(intersection):
             size = math.ceil(len(clust)/k)
             cluster_section = clust[size*th:size*(th+1)]
+            if not cluster_section:
+                continue
             thresholds[regions[i]].append(math.ceil(
                 statistics.mean(cluster_section)))
 
