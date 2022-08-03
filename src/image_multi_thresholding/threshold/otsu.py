@@ -27,7 +27,7 @@ def threshold_fom(img: np.ndarray, k: int):
     S = {(i, j): _mom1_up_to_level(prob, j) - _mom1_up_to_level(prob, i - 1)
          for i in range(L) for j in range(i, L)}
 
-    H = {(i, j): S[(i, j)]**2 / P[(i, j)]
+    H = {(i, j): S[(i, j)]**2 / P[(i, j)] if P[(i, j)] != 0 else 0
          for i in range(L) for j in range(i, L)}
     maxModifiedBCVar = 0
     optCandidate = None
