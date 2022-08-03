@@ -1,3 +1,2 @@
 scikit-image
-numba
 Pillow
